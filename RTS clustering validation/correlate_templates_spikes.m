@@ -1,4 +1,4 @@
-function [RTS_clu,res,corr] = correlate_templates_spikes ( fpath1,fpath2,offset_val)
+function [RTS_clu,res,corr] = correlate_templates_spikes ( fpath1,fpath2,offset_val,samples2use)
 
 
 %% init
@@ -6,7 +6,7 @@ function [RTS_clu,res,corr] = correlate_templates_spikes ( fpath1,fpath2,offset_
 offsets = - offset_val: offset_val;
 nOffsets = length(offsets);
 
-fname = dir(fullfile(fpath1,'templates.mat'));
+fname = fullfile(fpath1,'templates.mat');
 load(fname);
 
 templates = merged_templates;
@@ -22,6 +22,10 @@ raw_data_idx = ~cellfun(@isempty,strfind(names,'temp_wh.dat'));
 %% spike detection
 fname = fullfile(fpath2,files(raw_data_idx).name);
 res = spikeDetection ( fname, nchans );
+res = res(res > samples2use);
+if isempty(res)
+    flag = 1;
+end
 % samples = min(i * overlap_step, max_step);
 % idx = res > samples - overlap_step;
 % res(~idx) = [];
@@ -48,5 +52,5 @@ end
 corr = max(corr,[],3);
 [~,RTS_clu] = max(corr);
 RTS_clu = RTS_clu';
-nClusters = length(unique(RTS_clu));
-RTS_clu = [RTS_clu; nClusters];
+% nClusters = length(unique(RTS_clu));
+% RTS_clu = [RTS_clu; nClusters];

@@ -19,7 +19,7 @@ path2clu2 = fullfile(path2,clu2name);
 
 
 
-[clu1,res1] = load_clu_res (path2clu1,path2res1, [0 , 1]); % load clu1 and res1. remove clusters
+[clu1,res1] = load_clu_res (path2clu1,path2res1, [0 ]); % load clu1 and res1. remove clusters
 ... 0 and 1. by convention, these clusters are junk
 [clu2,res2] = load_clu_res (path2clu2,path2res2, [0]); % load clu2 and res2. ...
 ... remove cluster 0. while merging, any spike originating from an unknown
