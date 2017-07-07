@@ -138,14 +138,16 @@ end
 com_clusters=clusters1;
 count=0;
 for i = 3 : nFolders
-    one_frame_back = com_clusters(:,i-1:i );
+%     one_frame_back = com_clusters(:,i-1:i );
     two_frame_back = clusters2(:,i-2:2:i );
-    [B1,~]=sortrows(one_frame_back);
+%     [B1,~]=sortrows(one_frame_back);
     [B2,~]=sortrows(two_frame_back);
     %remove rows with no match
-    B1(sum(B1==0,2)>=1,:)=[];
+%     B1(sum(B1==0,2)>=1,:)=[];
+    possible_merges=~logical(clusters1(:,i-2)) & logical(clusters1(:,i));
+    B1=com_clusters(possible_merges,i);
     B2(sum(B2==0,2)>=1,:)=[];
-    new_match=setdiff(B2(:,2),B1(:,2));
+    new_match=intersect(B2(:,2),B1);
     new_match=[zeros(numel(new_match),1) , (new_match)];
     for j=1:size(new_match,1)
         new_match(j,1)=B2(B2(:,2)==new_match(j,2),1);

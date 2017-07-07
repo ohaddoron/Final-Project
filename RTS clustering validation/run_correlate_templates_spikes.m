@@ -14,14 +14,14 @@ RTS_clu = cell(20,1);
 RTS_res = cell(20,1);
 nFolders = length(names);
 for i = 2 : nFolders
-    if i > 2 
-        fpath0 = fullfile(fpath,sprintf('%d',names(i-1)));
-        files = dir(fpath0);
-        name = {files.name};
-        templates_idx = ~cellfun(@isempty,strfind(name,'templates.mat'));
-        load(fullfile(fpath1,files(templates_idx).name));
-        templates0 = merged_templates;
-    end
+%     if i > 2 
+%         fpath0 = fullfile(fpath,sprintf('%d',names(i-1)));
+%         files = dir(fpath0);
+%         name = {files.name};
+%         templates_idx = ~cellfun(@isempty,strfind(name,'templates.mat'));
+%         load(fullfile(fpath1,files(templates_idx).name));
+%         templates0 = merged_templates;
+%     end
     fpath1 = fullfile(fpath,sprintf('%d',names(i-1)));
     fpath2 = fullfile(fpath,sprintf('%d',names(i)));
     
@@ -31,12 +31,14 @@ for i = 2 : nFolders
     load(fullfile(fpath1,files(templates_idx).name));
     templates1 = merged_templates;
     
-    if i > 2
-        templates2remove = clusters(logical(clusters(:,i-2)) & logical(clusters(:,i-1)),i-2);
-        templates0(:,:,templates2remove) = -inf;
-    else
-        templates0 = ones(size(templates1(:,:,1))) * -inf;
-    end
+%     if i > 2
+%         templates2remove = clusters(logical(clusters(:,i-2)) & logical(clusters(:,i-1)),i-2);
+%         templates0(:,:,templates2remove) = -inf;
+%     else
+%         templates0 = ones(size(templates1(:,:,1))) * -inf;
+%     end
+%     [clu,res] = correlate_templates_spikes(offset_val, overlap,max_overlap,templates0,templates1);
+    [clu,res] = correlate_templates_spikes(fpath1,fpath2,offset_val);
     
         
     
