@@ -86,7 +86,7 @@ for i = 3 : nFolders
     else
         overlap1 = min([(i-2) * overlap_step, 2*overlap_step]);
     end
-    overlap2 = (max_overlap-overlap_step);
+    overlap2 = min(max_overlap-overlap_step,(i-2) * overlap_step);
 
     %% remove noisy spikes
     if remove_noise_spikes
