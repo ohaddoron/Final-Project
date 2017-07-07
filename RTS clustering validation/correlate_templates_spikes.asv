@@ -1,14 +1,16 @@
-function [RTS_clu,res,corr] = correlate_templates_spikes ( offset_val,...
-    overlap, max_sample,templates1,varargin )
+function [RTS_clu,res,corr] = correlate_templates_spikes ( fpath1,fpath2,...
+    offset_val,overlap_step,max_time,Fs,i )
 
 
 %% init
-if ~isempty(varargin)
-    templates2 = varargin{1};
-end
 offsets = - offset_val: offset_val;
 nOffsets = length(offsets);
-
+overlap_step = overlap_step * 60 * Fs; 
+max_step = max_time * 60 * Fs; % maximal time in samples
+files = dir(fpath1);
+names = {files.name};
+templates_idx = ~cellfun(@isempty,strfind(names,'templates.mat'));
+load(fullfile(fpath1,files(templates_idx).name));
 
 templates = merged_templates;
 templates_idx = noise_remover(templates);
@@ -23,9 +25,9 @@ raw_data_idx = ~cellfun(@isempty,strfind(names,'temp_wh.dat'));
 %% spike detection
 fname = fullfile(fpath2,files(raw_data_idx).name);
 res = spikeDetection ( fname, nchans );
-% samples = min(i * overlap_step, max_step);
-% idx = res > samples - overlap_step;
-% res(~idx) = [];
+samples = min(i * overlap_step, max_step);
+idx = tmp_res > samples - overlap_step;
+tmp_res(~idx) = [];
 spikes  = read_spikes( fname ,nchans,nTP,[],res,0 );
 
 nSpikes = size(spikes,3);

@@ -8,8 +8,6 @@ folders(1:2) = [];
 folders(~[folders.isdir]) = [];
 fnames = cell2mat(cellfun(@str2num,{folders.name},'UniformOutput',false));
 ordered_names = sort(fnames);
-clu = [];
-res = [];
 
 % figure, hold on;
 
@@ -24,7 +22,16 @@ for i = 1 : length(ordered_names)
     path2clu = fullfile(cur_path,files(cluidx).name);
 
     %% load the new clu and res
-    
+    % in case this is the first iteration, simply add the current clu
+    % and res
+    if i == 1
+        [clu,res] = load_clu_res (path2clu, path2res , 0);
+        idx = ~ismember(clu,clusters(:,i));
+        clu(idx) = [];
+        res(idx) = [];
+%         plot(res,ones(length(res),1),'.'); drawnow;
+        continue
+    end
     [tmp_clu,tmp_res] = load_clu_res (path2clu, path2res , 0);
     % use only the last overlap step to avoid overlap
     samples = min(i * overlap_step, max_step);
@@ -42,17 +49,25 @@ for i = 1 : length(ordered_names)
     else
         new_res = tmp_res;
     end
+    tmp_clusters = clusters; 
     new_clu = tmp_clu;
     %% replace current clu values with previous
+    prev_clus = unique(clusters(:,i-1));
+    prev_clus(prev_clus == 0) = [];
     cur_clus = unique(clusters(:,i));
     cur_clus(cur_clus == 0) = [];
     for k = 1 : length(cur_clus)
-        new_clu(tmp_clu == cur_clus(k)) = find(clusters(:,i) == cur_clus(k));
+        idx = findclusters(:,i) == cur_clus(k);
+        if clusters(idx,i) == 0
+            m = max(m,clusters(:,i)) + 1;
+            new_clu(tmp_clu == cur_clus(k)) = m;
+            clusters(idx,i) = m;
+        else
+            new_clu(tmp_clu == cur_clus(k)) = clusters(idx,i);
+            clusters(idx,i) = clusters(idx,i-1);
+        end
     end
-    tmp = (1 : size(clusters,1))';
-    tmp(~logical(clusters(:,i))) = 0;
-    clusters(:,i) = tmp;
-    
+        
     
     
     %% add overlap to res
@@ -60,7 +75,7 @@ for i = 1 : length(ordered_names)
     
     clu = [clu; new_clu];
     res = [res; new_res];
-%     m = max(clu);
+    m = max(clu);
 end
 clu = [length(unique(clu)); clu];
 dlmwrite(fullfile(fpath,'OLM.clu.2'),clu);
