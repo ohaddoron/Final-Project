@@ -1,5 +1,15 @@
-function combine_OTM_clu(fpath,clusters,overlap_step,max_time,Fs)
-    %% init
+function post_process_clusters = combine_OTM_clu(fpath,clusters,overlap_step,max_time,Fs)
+%% Input
+% fpath - path to folders
+% Fs is given in Hz
+% clusters matrix - a matrix that indexes cluster # between file i and i+1.
+% It is the output of run_match_clusters
+% overlap_step - non-overlaping part of .dat files in minutes
+%max_time - max .dat. file size in minutes
+%% Output
+% The function writes the new combined clu file and outputs the new
+% clusters file
+%% init
 overlap_step = overlap_step * 60 * Fs; 
 max_step = max_time * 60 * Fs; % maximal time in samples
 clusters(sum(clusters,2)==0,:) = []; % remove zero lines
@@ -10,6 +20,7 @@ fnames = cell2mat(cellfun(@str2num,{folders.name},'UniformOutput',false));
 ordered_names = sort(fnames);
 clu = [];
 res = [];
+count = 0;
 
 % figure, hold on;
 
@@ -33,10 +44,13 @@ for i = 1 : length(ordered_names)
     tmp_clu(idx) = [];
     tmp_res(idx) = [];
     
-    
+    %take only non-overlap part
     idx = tmp_res > samples - overlap_step;
     tmp_res(~idx) = [];
     tmp_clu(~idx) = [];
+    
+    % Every res file begins from the relative zero. We add this relative
+    % zero to every res file
     if samples == max_step
         new_res = tmp_res + i * overlap_step - max_step;
     else
@@ -46,6 +60,9 @@ for i = 1 : length(ordered_names)
     %% replace current clu values with previous
     cur_clus = unique(clusters(:,i));
     cur_clus(cur_clus == 0) = [];
+    if length(cur_clus) ~= length(unique(new_clu))
+        count = count + 1;
+    end
     for k = 1 : length(cur_clus)
         new_clu(tmp_clu == cur_clus(k)) = find(clusters(:,i) == cur_clus(k));
     end
@@ -62,6 +79,7 @@ for i = 1 : length(ordered_names)
     res = [res; new_res];
 %     m = max(clu);
 end
+post_process_clusters = clusters;
 clu = [length(unique(clu)); clu];
 dlmwrite(fullfile(fpath,'OLM.clu.2'),clu);
 dlmwrite(fullfile(fpath,'OLM.res.2'),res,'precision',100);

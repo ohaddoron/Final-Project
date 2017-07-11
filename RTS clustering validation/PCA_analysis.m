@@ -33,6 +33,10 @@ switch clusterMethod
         files = dir(fullfile(fpath,'*.2'));
     case 'KK'
         files = dir(fullfile(fpath,'*.1'));
+    case 'RTS'
+        files = dir(fullfile(fpath,'*RTS*'));
+    case 'OLM'
+        files = dir(fullfile(fpath,'*OLM*'));
 end
 clu_idx = ~cellfun(@isempty,strfind({files.name},'clu'));
 res_idx = ~cellfun(@isempty,strfind({files.name},'res'));
@@ -51,11 +55,11 @@ N_PC=3;
 
 
 %% partition into blocks
-info = dir( fname );
-nsamples = info.bytes / nbytes / nchans;
-nblocks = ceil( nsamples / blocksize );
-blocks = [ 1 : blocksize : blocksize * nblocks; blocksize : blocksize : blocksize * nblocks ]';
-blocks( nblocks, 2 ) = nsamples;
+% info = dir( fname );
+% nsamples = info.bytes / nbytes / nchans;
+% nblocks = ceil( nsamples / blocksize );
+% blocks = [ 1 : blocksize : blocksize * nblocks; blocksize : blocksize : blocksize * nblocks ]';
+% blocks( nblocks, 2 ) = nsamples;
 
 %%  load clu res
 [clu,res] = load_clu_res (path2clu, path2res , clusters2remove);
@@ -63,61 +67,8 @@ merged_templates_idx = repmat((1 : length(unique(clu)))', 1 , 2);
 clusternames=merged_templates_idx(:,2);
 N_cluster=length(clusternames);
 N_spikes_tot=length(clu);
-%%  go over blocks and analyze
-% if we ever use the entire data set, this will have to be altered to work
-% on blocks for real and not as it is currently reading all blocks and
-% saving them. Currently, we are working batch-wise and saving the spikes
-% in each batch
-for i = 1 : nblocks
-%     tic;
-    %load dat
-    boff = ( blocks( i, 1 ) - 1 ) * nbytes * nchans;
-    bsize = ( diff( blocks( i, : ) ) + 1 );
-%    to analize sipkes at the ends of a batch read an extra
-%    tmplate_time_length at evary batch 
-    if i==1 % in first batch start from 0 and read extra tmplate_time_length
-        m = memmapfile( fname, 'Format', 'int16', 'Offset', 0, 'Repeat',...
-            (bsize+template_time_length)*nchans, 'writable', true );
-        d = reshape( m.data, [ nchans bsize+template_time_length ] );
-    elseif i==nblocks  % in last batch start from batchoffset-tmplate_time_length and read extra tmplate_time_length
-        m = memmapfile( fname, 'Format', 'int16', 'Offset', (boff-template_time_length*nchans * nbytes), ...
-            'Repeat', (bsize+template_time_length)*nchans, 'writable', true );
-        d = reshape( m.data, [ nchans bsize+template_time_length ] );
-    else% in last batch start from batchoffset-tmplate_time_length and read 2 extra tmplate_time_length
-        m = memmapfile( fname, 'Format', 'int16', 'Offset', (boff-template_time_length*nchans * nbytes),...
-            'Repeat', (bsize+2*template_time_length)*nchans, 'writable', true );
-        d = reshape( m.data, [ nchans bsize+2*template_time_length ] );
-    end
-    spikes_in_batch=sum(and(res>(i-1)*blocksize,res<(i-1)*blocksize+bsize+1));
-    tmpres=res(and(res>(i-1)*blocksize,res<(i-1)*blocksize+bsize+1))-(i-1)*blocksize;
-    tmpwaveform=zeros(nchans,template_time_length,spikes_in_batch);
-    for j=1:spikes_in_batch
-        if i==1%in batch spike NO OFFSET
-            spike_wavform=double(d(:,((tmpres(j)-template_time_length/2+resOffest):...
-              (tmpres(j)+template_time_length/2-1+resOffest)))); 
-            spike_wavform=normr(spike_wavform);
-            else
-                try
-                    % if there are not enough time points to sample
-                    % for this spike, break and finish. this happens at
-                    % the last spike in the batch - ON
-%                     in non first batch ther is  a tmplate_time_length
-%                     offset
-                    spike_wavform=double(d(:,template_time_length+((tmpres(j)-template_time_length/2+resOffest):...
-                        (tmpres(j)+template_time_length/2-1+resOffest))));
-                    % normalize each row so the norm of a row is 1
-                    spike_wavform=normr(spike_wavform); 
-                catch
-                    break
-                end
-        end
-        tmpwaveform(:,:,j)=spike_wavform;
-    end
-    allspikes=cat(3,allspikes,tmpwaveform);
-    clear d m spikes_in_batch tmp_cor_M tmp_amp tmpwaveform
-%     toc;
-end
 
+[ allspikes ] = read_spikes( fname ,nchans,template_time_length,clu,res,0);
 %% Ghost code
 % Using the mahal function instead of calculating the mean and coviariance
 % matrix of each cluster. Ori claims he will fix it one day

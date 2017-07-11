@@ -44,18 +44,18 @@ p = 1/2* (1+ erf((X-mu)./(sigma*sqrt(2))));
 %% save to result struct
 
 
-for i = 1 : n_clusters
-    result.hits(i) = nansum(clu(clu==merged_templates_idx(i,2)) - ...
-        RTS_clu(clu==merged_templates_idx(i,2)) == 0)/...
-        length(clu(clu==merged_templates_idx(i,2))) * 100;
-    result.FP(i) = nansum(clu(RTS_clu==merged_templates_idx(i,2)) - ...
-        RTS_clu(RTS_clu==merged_templates_idx(i,2)) ~= 0)/...
-        length(RTS_clu(RTS_clu==merged_templates_idx(i,2))) * 100;
-end
+% for i = 1 : n_clusters
+%     result.hits(i) = nansum(clu(clu==merged_templates_idx(i,2)) - ...
+%         RTS_clu(clu==merged_templates_idx(i,2)) == 0)/...
+%         length(clu(clu==merged_templates_idx(i,2))) * 100;
+%     result.FP(i) = nansum(clu(RTS_clu==merged_templates_idx(i,2)) - ...
+%         RTS_clu(RTS_clu==merged_templates_idx(i,2)) ~= 0)/...
+%         length(RTS_clu(RTS_clu==merged_templates_idx(i,2))) * 100;
+% end
 result.FP(ID < thresh) = nan;
 result.hits(ID < thresh) = nan;
 result.correlation_matrix = cor_M;
-result.RTS_clu = [length(unique(RTS_clu)); RTS_clu];
+% result.RTS_clu = [length(unique(RTS_clu)); RTS_clu];
 result.probabilities = p;
 % result.likelihood = liklihod;
 result.I_dis=ID;

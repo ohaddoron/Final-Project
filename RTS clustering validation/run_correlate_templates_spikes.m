@@ -11,12 +11,14 @@ names = sort(cellfun(@str2num,{files.name}));
 RTS_clu = cell(20,1);
 RTS_res = cell(20,1);
 nFolders = length(names);
+clusters(sum(clusters,2)==0,:) = [];
+count = 1;
 %% 
 for i = 2 : nFolders
 
     fpath1 = fullfile(fpath,sprintf('%d',names(i-1)));
     fpath2 = fullfile(fpath,sprintf('%d',names(i)));
-    nSamples = min((i-1)*overlap_step,max_step);
+    nSamples = min(i*overlap_step,max_step);
     samples2use = nSamples - overlap_step;
     [tmp_clu,tmp_res] = correlate_templates_spikes(fpath1,fpath2,offset_val,samples2use);
     new_clu = tmp_clu;
@@ -25,7 +27,13 @@ for i = 2 : nFolders
     for k = 1 : length(cur_clu)
         new_clu(tmp_clu == cur_clu(k)) = find(clusters(:,i-1) == cur_clu(k));
     end
-    new_res = tmp_res + (i-1) * overlap_step;
+    
+    if i > max_step / overlap_step
+        new_res = tmp_res + count * overlap_step;
+        count = count + 1;
+    else
+        new_res = tmp_res;    
+    end
         
     clu = [clu; new_clu];
     res = [res; new_res];

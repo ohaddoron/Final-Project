@@ -49,12 +49,15 @@ for i = 1 : nblocks
     threshold = -4.5*std(double(d(:)));
     [~,spike_times{i}] = find(d(:,2:end-1) < threshold  & d(:,1:end-2) > d(:,2:end-1)...
         & d(:,3:end) > d(:,2:end-1));
+
     spike_times{i} = spike_times{i} + blocks(i,1);
 
     
     
     
 end
+spike_times{1}(spike_times{1} < template_time_length/2 ) = [];
+spike_times{end}(spike_times{end} > max(blocks(:)) - template_time_length/2) = [];
 spikes = cat(1,spike_times{:});
 return
 
