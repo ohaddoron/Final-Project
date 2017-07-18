@@ -1,4 +1,4 @@
-function [RTS_clu,res,corr] = correlate_templates_spikes ( fpath1,fpath2,offset_val,samples2use)
+function [RTS_clu,res,corr] = correlate_templates_spikes ( fpath1,fpath2,offset_val,samples2use,template_time_length)
 
 
 %% init
@@ -21,7 +21,7 @@ raw_data_idx = ~cellfun(@isempty,strfind(names,'temp_wh.dat'));
 
 %% spike detection
 fname = fullfile(fpath2,files(raw_data_idx).name);
-res = spikeDetection ( fname, nchans );
+res = spikeDetection ( fname, nchans,template_time_length );
 res = res(res > samples2use);
 if isempty(res)
     flag = 1;

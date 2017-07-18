@@ -1,4 +1,4 @@
-function [clu,res] = run_correlate_templates_spikes(fpath,offset_val,overlap_step,max_time,Fs,clusters)
+function [clu,res] = create_RTS_clu_res(fpath,offset_val,overlap_step,max_time,Fs,clusters,template_time_length)
 %% init
 max_step = max_time * Fs * 60;
 overlap_step = overlap_step * Fs * 60;
@@ -20,7 +20,7 @@ for i = 2 : nFolders
     fpath2 = fullfile(fpath,sprintf('%d',names(i)));
     nSamples = min(i*overlap_step,max_step);
     samples2use = nSamples - overlap_step;
-    [tmp_clu,tmp_res] = correlate_templates_spikes(fpath1,fpath2,offset_val,samples2use);
+    [tmp_clu,tmp_res] = correlate_templates_spikes(fpath1,fpath2,offset_val,samples2use,template_time_length);
     new_clu = tmp_clu;
     cur_clu = unique(clusters(:,i-1));
     cur_clu(~logical(cur_clu)) = [];
