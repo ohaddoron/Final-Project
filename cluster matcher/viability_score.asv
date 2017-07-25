@@ -22,8 +22,11 @@ for i = 1 : nFolders
     [~,L_ratio,ID] = PCA_analysis...
         (path,nchans,template_time_length,0,'KS',[],[]);
     % If any of the clusters were not assigned any spikes to, the ID will
-    % be zero. 
-    ID(ID == 0) = [];
+    % be zero. This is of no intereset to us.
+%     if max(templates_idx) > length(ID)
+%         flag = 1;
+%     end
+%     ID(ID == 0) = nan;
     % use only scores of relevant clusters
     ID = ID(templates_idx);
     L_ratio = L_ratio(templates_idx);
@@ -34,7 +37,7 @@ end
 %% plot scores
 S(isnan(S)) = 0;
 % viability vs ID
-[~,ID_scores] = find(S(:,:,1));
+[~,ID_scores] = find(S(:,:,1),1);
 figure,  
 
 

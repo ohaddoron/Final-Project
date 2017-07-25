@@ -23,10 +23,10 @@ for i = 1 : nFolders
         (path,nchans,template_time_length,0,'KS',[],[]);
     % If any of the clusters were not assigned any spikes to, the ID will
     % be zero. This is of no intereset to us.
-    if max(templates_idx) > length(ID)
-        flag = 1;
-    end
-    ID(ID == 0) = nan;
+%     if max(templates_idx) > length(ID)
+%         flag = 1;
+%     end
+%     ID(ID == 0) = nan;
     % use only scores of relevant clusters
     ID = ID(templates_idx);
     L_ratio = L_ratio(templates_idx);

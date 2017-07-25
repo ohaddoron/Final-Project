@@ -63,7 +63,7 @@ N_PC=3;
 
 %%  load clu res
 [clu,res] = load_clu_res (path2clu, path2res , clusters2remove);
-merged_templates_idx = repmat((1 : length(unique(clu)))', 1 , 2);
+merged_templates_idx = repmat((1 : max(unique(clu)))', 1 , 2);
 clusternames=merged_templates_idx(:,2);
 N_cluster=length(clusternames);
 N_spikes_tot=length(clu);
