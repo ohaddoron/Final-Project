@@ -8,19 +8,8 @@ if length(varargin) >= 2
     remove_noise = varargin{2};
 end
 
-
-
-% path1 = 'D:\matlab\KiloSort-master\ES Data\Second Half C1_8';
-% path2 = 'D:\matlab\KiloSort-master\ES Data\Second Half C1_8';
-% path2res1 = fullfile(path1,'es25nov11.013.1.2.3.4.5.6.7.8 split2.res.1');
-% path2res2 = fullfile(path2,'es25nov11.013.1.2.3.4.5.6.7.8 split2.res.2');
-% path2clu1 = fullfile(path1,'es25nov11.013.1.2.3.4.5.6.7.8 split2.clu.1');
-% path2clu2 = fullfile(path2,'es25nov11.013.1.2.3.4.5.6.7.8 split2.clu.2');
-
-% samples_offset=2;
 f_half = nan(1,4); 
-% first col with all spikes
-%% 
+%% load clu and res files
 files1 = dir(fullfile(path1));
 res1name = files1(~cellfun(@isempty,strfind({files1.name},'.res.'))).name;
 clu1name = files1(~cellfun(@isempty,strfind({files1.name},'.clu.'))).name;
@@ -32,14 +21,13 @@ path2res1 = fullfile(path1,res1name);
 path2res2 = fullfile(path2,res2name);
 path2clu1 = fullfile(path1,clu1name);
 path2clu2 = fullfile(path2,clu2name);
-
-%% calculate hits
-
-
-
 [clu1,res1] = load_clu_res (path2clu1,path2res1, 0 ); % load clu1 and res1. remove clusters
 ... 0 and 1. by convention, these clusters are junk
-    
+[clu2,res2] = load_clu_res (path2clu2,path2res2, 0 ); % load clu2 and res2. ...
+    ... remove cluster 0. while merging, any spike originating from an unknown
+        ... source 
+
+%% removal of noise clusters    
 if exist('remove_noise','var')
     if remove_noise
         path2templates = fullfile(path1,'templates.mat');
@@ -50,10 +38,10 @@ if exist('remove_noise','var')
         res1(idx2remove) = [];
     end
 end
-
-[clu2,res2] = load_clu_res (path2clu2,path2res2, 0 ); % load clu2 and res2. ...
-... remove cluster 0. while merging, any spike originating from an unknown
-    ... source 
+%% Calculate hits
+% The hits matrix is used to match between clusters from the different
+% methods. It counts the number of times a spikes is labels as labeled x in
+% method 1 and is labeled y in method 2
 
 analysis1 = create_analysis (clu1,res1,clu2,res2,samples_offset) ;
 analysis2 = create_analysis (clu2,res2,clu1,res1,samples_offset) ;
@@ -66,7 +54,10 @@ end
 m = sum(hits,2);
 tmp_hits = bsxfun(@rdivide,hits,m);
 figure, imagesc(tmp_hits);
-
+xlabel('Method 2');
+ylabel('Method 1');
+caxis([0 0.6]);
+colorbar
 %% all spikes
  
 [P,R] = precision_recall ( hits );
@@ -92,6 +83,6 @@ hits = tmp_hits;
 %% 
 spk1 = sum(hits,2);
 spk2 = sum(hits);
-miss1 = spk1(1)/sum(spk1); % spikes Eran missed but KS found
-miss2 = spk2(1)/sum(spk2); % spikes KS missed but Eran found
+miss1 = spk1(1)/sum(spk1); % Spikes detected by method 1 but not by method 2
+miss2 = spk2(1)/sum(spk2); % Spikes detected by method 2 but not by method 1
 

@@ -1,9 +1,14 @@
 function analysis = create_analysis (clu1,res1,clu2,res2,samples_offset) 
+% Analysis maps clu2 to clu1. If two spikes were registered at the same
+% time (concidering the sample offset) according to their respective res 
+% files, the respective row in analysis will have the indices of their
+% clusters. Otherwise, the row will have the indices of clu1 and 0 at the
+% second col.
 
-cluster_labels1=unique(clu1);
-cluster_labels2=unique(clu2);
-
-
+%% init
+% we currently did not attempt to resolve the issue of temporally
+% overlapping spike peaks. This is an issue that may be resolved in the
+% future.
 idx2remove1 = diff(res1) == 0;
 idx2remove2 = diff(res2) == 0;
 
@@ -17,25 +22,14 @@ N_spike2=numel(res2);
 
 analysis=nan(N_spike1,2);
 analysis(:,1)=clu1;
-
+%% match clu
+% First, find the res indices matching two different clusters. Once these
+% indices are found, place the clu originating from said indices in the
+% appropriate location
 for i = -samples_offset : samples_offset
     tmp_res2 = res2 + i;
     idx1 = ismember(res1,tmp_res2);
     idx2 = ismember(tmp_res2,res1);
     analysis(idx1,2) = clu2(idx2);
-%     idx2 = ismember(tmp_res2,
 end
 analysis(isnan(analysis))=0;
-
-% for i=1:N_spike1
-%     [diff, idx]=min(abs((res1(i)-res2)));
-%     if diff<=samples_offset
-%         try
-%             analysis(i,2)=clu2(idx);
-%         catch
-%             ...
-%         end
-%     else
-%         analysis(i,2)=0;
-%     end
-% end
