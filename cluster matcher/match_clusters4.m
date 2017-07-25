@@ -10,7 +10,7 @@ if isempty(varargin)
     overlap2 = 30; % number of minutes to leave in the second file
     Fs = 20e3; % sampling rate in Hz
     min_spikes = 1000; % minimal amount of spikes for a cluster to be concidered
-    thresh = 0.7; % threshold for cluster matching
+    thresh = 0.4; % threshold for cluster matching
 else
     overlap1 = varargin{1};
     overlap2 = varargin{2};

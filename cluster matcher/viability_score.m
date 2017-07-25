@@ -23,10 +23,6 @@ for i = 1 : nFolders
         (path,nchans,template_time_length,0,'KS',[],[]);
     % If any of the clusters were not assigned any spikes to, the ID will
     % be zero. This is of no intereset to us.
-%     if max(templates_idx) > length(ID)
-%         flag = 1;
-%     end
-%     ID(ID == 0) = nan;
     % use only scores of relevant clusters
     ID = ID(templates_idx);
     L_ratio = L_ratio(templates_idx);
@@ -36,12 +32,12 @@ for i = 1 : nFolders
 end
 %% plot scores
 S(isnan(S)) = 0;
-% viability vs ID
-[~,ID_scores] = find(S(:,:,1));
-figure,  
-
-
-
+% find first occurence idx
+[r,c]=find(S(:,:,1)>0);
+idx=sortrows([r,c]);
+ix=[true;diff(idx(:,1))~=0];
+idx = idx(ix,:);
+idx = sub2ind(size(S(:,:,1)),idx(:,1),idx(:,2));
 return
     
 
