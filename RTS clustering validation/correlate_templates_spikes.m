@@ -1,4 +1,4 @@
-function [RTS_clu,res,corr] = correlate_templates_spikes ( fpath1,fpath2,offset_val,samples2use,template_time_length)
+function [RTS_clu,res,corr] = correlate_templates_spikes ( fpath1,fpath2,offset_val,samples2use,template_time_length,templates_idx)
 
 
 %% init
@@ -10,7 +10,10 @@ fname = fullfile(fpath1,'templates.mat');
 load(fname);
 
 templates = merged_templates;
-templates_idx = noise_remover(templates);
+% templates_idx = noise_remover(templates);
+
+
+
 templates(:,:,~ismember(1:size(templates,3),templates_idx)) = -inf;
 
 [nchans,nTP,nTemplates] = size(templates);

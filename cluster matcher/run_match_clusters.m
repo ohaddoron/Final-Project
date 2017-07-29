@@ -9,6 +9,11 @@ else
     Fs = varargin{2};
     overlap_step = varargin{3};
 end
+if length(varargin) > 3
+    thresh = varargin{4};
+else 
+    thresh = 1000;
+end
 %%
 files = dir(fpath);
 names = {files.name};
@@ -38,18 +43,57 @@ for i = 2 : nFolders
     overlap2 = min([max_overlap,(i-1) * overlap_step]);
     
     %% remove noisy spikes
+    load(fullfile(cur_path{1}, '\templates.mat'));
+    merged_templates1 = merged_templates;
+    load(fullfile(cur_path{2},'templates.mat'));
+    merged_templates2 = merged_templates;
+
     if remove_noise_spikes
-        load(fullfile(cur_path{1}, '\templates.mat'));
-        templates2keep{1} = noise_remover(merged_templates);
-        nTemplates1 = size(merged_templates,3);
-        load(fullfile(cur_path{2},'templates.mat'));
-        templates2keep{2} = noise_remover(merged_templates);
-        nTemplates2 = size(merged_templates,3);
+        templates2keep{1} = noise_remover(merged_templates1);
+        templates2keep{2} = noise_remover(merged_templates2);
+        
+        files1 = dir(cur_path{1});
+        files2 = dir(cur_path{2});
+        
+        clu1_idx = ~cellfun(@isempty,strfind({files1.name},'.clu.2'));
+        res1_idx = ~cellfun(@isempty,strfind({files1.name},'.res.2'));
+        
+        res2_idx = ~cellfun(@isempty,strfind({files2.name},'.res.2'));
+        clu2_idx = ~cellfun(@isempty,strfind({files2.name},'.clu.2'));
+
+        path2clu1 = fullfile(cur_path{1},files1(clu1_idx).name);
+        path2res1 = fullfile(cur_path{1},files1(res1_idx).name);
+
+        path2clu2 = fullfile(cur_path{2},files2(clu2_idx).name);
+        path2res2 = fullfile(cur_path{2},files2(res2_idx).name);
+        
+        [clu1,res1] = load_clu_res(path2clu1,path2res1,0);
+        clu1(~ismember(clu1,templates2keep{1})) = [];
+        [clu2,res2] = load_clu_res(path2clu2,path2res2,0);
+        clu2(~ismember(clu2,templates2keep{2})) = [];
+        for k = 1 : max(unique(clu1))
+            if sum(clu1 == k) < thresh && sum(clu1 == k) > 0
+                templates2keep{1}(templates2keep{1} == k) = [];
+            end
+        end
+        for k = 1 : max(unique(clu2))
+            if sum(clu2 == k) < thresh && sum(clu2 == k) > 0
+                templates2keep{2}(templates2keep{2} == k) = [];
+            end
+        end
+                
+
+        
     else
         templates2keep = cell(2,1);
     end
+    nTemplates1 = size(merged_templates1,3);
+    nTemplates2 = size(merged_templates2,3);
+
     [results{i-1}]=match_clusters4( cur_path,clusters2remove,origin,...
         templates2keep,overlap1,overlap2,Fs,1000,0.6);
+    results{i-1}.templates2keep = templates2keep;
+
     if i == 2
         clusters = (1:nTemplates1)';        
         prev = 1:nTemplates2;

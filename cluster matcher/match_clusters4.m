@@ -10,7 +10,7 @@ if isempty(varargin)
     overlap2 = 30; % number of minutes to leave in the second file
     Fs = 20e3; % sampling rate in Hz
     min_spikes = 1000; % minimal amount of spikes for a cluster to be concidered
-    thresh = 0.4; % threshold for cluster matching
+    thresh = 0.7; % threshold for cluster matching
 else
     overlap1 = varargin{1};
     overlap2 = varargin{2};
@@ -144,7 +144,7 @@ result.match_score = match_score;
 result.n_match_score = n_match_score;
 
 %% create matching index
-result.matches=nan(nClusters2,1);
+result.matches=nan(nClusters1,1);
 n_match_score(S < min_spikes, : ) = -inf;
 
 
@@ -154,8 +154,10 @@ while max(n_match_score(:)) > thresh
     result.matches(R)=C;
     n_match_score(R,:)=-inf;
     n_match_score(:,C)=-inf;
-%     figure, imagesc(n_match_score);
+%     figure, imagesc(n_match_score); colorbar
+%     pause(3);
 end
+
 result.min_spikes = min_spikes;
 result.threshold = thresh;
 return

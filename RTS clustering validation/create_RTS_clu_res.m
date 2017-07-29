@@ -1,5 +1,10 @@
-function [clu,res] = create_RTS_clu_res(fpath,offset_val,overlap_step,max_time,Fs,clusters,template_time_length)
+function [clu,res] = create_RTS_clu_res(fpath,offset_val,overlap_step,max_time,Fs,clusters,template_time_length,varargin)
 %% init
+if ~isempty(varargin)
+    thresh = varargin{1};
+else
+    thresh = 1000;
+end
 max_step = max_time * Fs * 60;
 overlap_step = overlap_step * Fs * 60;
 clu = [];
@@ -20,10 +25,12 @@ for i = 2 : nFolders
     fpath2 = fullfile(fpath,sprintf('%d',names(i)));
     nSamples = min(i*overlap_step,max_step);
     samples2use = nSamples - overlap_step;
-    [tmp_clu,tmp_res] = correlate_templates_spikes(fpath1,fpath2,offset_val,samples2use,template_time_length);
-    new_clu = tmp_clu;
+    
     cur_clu = unique(clusters(:,i-1));
     cur_clu(~logical(cur_clu)) = [];
+    [tmp_clu,tmp_res] = correlate_templates_spikes(fpath1,fpath2,offset_val,samples2use,template_time_length,cur_clu);
+    new_clu = tmp_clu;
+    
     for k = 1 : length(cur_clu)
         new_clu(tmp_clu == cur_clu(k)) = find(clusters(:,i-1) == cur_clu(k));
     end
@@ -40,6 +47,7 @@ for i = 2 : nFolders
         
     
 end
+
 clu = [length(unique(clu)); clu];
 dlmwrite(fullfile(fpath,'RTS.clu.3'),clu);
 dlmwrite(fullfile(fpath,'RTS.res.3'),res,'precision',100);
