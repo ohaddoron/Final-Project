@@ -29,7 +29,7 @@
 
 % 30-may-12 ES
 
-function rc = partition( sourcefile, newfiles, periods, nchans, precision )
+function [rc,newfiles] = partition( sourcefile, newfiles, periods, nchans, precision )
 
 % input arguments
 nargs = nargin;
