@@ -1,5 +1,10 @@
 function [results,clusters] = run_match_clusters( fpath ,remove_noise_spikes, varargin)
-
+% run match clusters will cycle through all partitions of files and create
+% the clusters matrix. The clusters matrix maps the cluster index from one
+% frame to the next. In addition, the results structure will be return
+% containing information regarding the decisions made for the cluster
+% matrix
+%% init
 if isempty(varargin)
     max_overlap = 30; %min - maximal overlap between files
     Fs = 20e3; % min - sampling rate
@@ -14,7 +19,6 @@ if length(varargin) > 3
 else 
     thresh = 1000;
 end
-%%
 files = dir(fpath);
 names = {files.name};
 fnames = cellfun(@str2num,names,'UniformOutput',false);
@@ -28,7 +32,7 @@ nchans = 8;
 template_time_length = 82;
 origin = 1;
 results = cell(nFolders-1,1);
-%%
+%% main
 for i = 2 : nFolders
     %% set paths to previous and current folder
     cur_path{1} = fullfile(fpath,sprintf('%d',ordered_names(i-1)));
