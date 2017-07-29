@@ -29,8 +29,8 @@ RTS_res_path = fullfile(fpath,files(idx).name);
 
 %% run correlation
 
-[~,~,ID_OLM] = PCA_analysis(fpath,nchans,template_time_length,...
-    clusters2remove,'KS',offset,[]);
+% [~,~,ID_OLM] = PCA_analysis(fpath,nchans,template_time_length,...
+%     clusters2remove,'OLM',offset,[]);
 % [~,~,ID_RTS] = PCA_analysis(fpath,nchans,template_time_length,...
 %     clusters2remove,'RTS',offset,[]);
 
@@ -68,12 +68,14 @@ idx_inherent_E_first_frame=(~idx_OLM) &   (OLM_res<overlap_step);
 result.FNR_inherent_first_frame=sum(idx_inherent_E_first_frame)/length(OLM_clu);
 result.precision_detection=1-sum(idx_RTS)/length(RTS_clu);
 result.sensitivity_detection=sum(idx_RTS)/(length(OLM_clu)-sum(idx_inherent_E_first_frame));
+
 %remove spikes
 OLM_clu = OLM_clu(idx_OLM);
 OLM_res=OLM_res(idx_OLM);
 RTS_clu = RTS_clu(idx_RTS);
 RTS_res = RTS_res(idx_RTS);
 %compare classification
+result.N_spiks_before_inherent=length(RTS_clu);
 [ result.sensitivity_calssification,result.precision_calssification ] =...
     compare_clus( OLM_clu ,RTS_clu,N_clusters);
 
@@ -93,7 +95,6 @@ end
 %clc error rates
 result.inherent_undetectionble=sum(early_spikes)/length(RTS_clu);
 result.inherent_false_calssification=sum(late_spikes)/length(RTS_clu);
-
 %remove spikes
 OLM_clu = OLM_clu((~early_spikes)&(~late_spikes));
 OLM_res=OLM_res((~early_spikes)&(~late_spikes));
@@ -101,14 +102,14 @@ RTS_clu = RTS_clu((~early_spikes)&(~late_spikes));
 RTS_res = RTS_res((~early_spikes)&(~late_spikes));
 
 %compare classification
-
+result.N_spiks_after_inherent=length(RTS_clu);
 [ result.sensitivity_calssification_rmoved_inherent,...
     result.precision_calssification_rmoved_inherent ] =...
     compare_clus( OLM_clu ,RTS_clu,N_clusters);
 
+% result.I_dis=ID_OLM;
 
 
-result.I_dis=ID;
 return
 
 
