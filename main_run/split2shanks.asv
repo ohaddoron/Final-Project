@@ -1,0 +1,12 @@
+function split2shanks ( fpath , files , nFiles, nchans, nchans_tot )
+
+for f = 1 : nFiles
+    fname = fullfile(fpath,files(f).name);
+    for channel = 1 : nchans(f) : nchans_tot
+    cur_path = fullfile(fpath,files(f).name,sprintf('%d - %d',(f-1) * nchans(f) + 1, f * nchans(f)));
+    
+    if ~exist(cur_path,'file');
+        mkdir(fullfile(fpath,files(f).name,sprintf('%d - %d',(f-1) * nchans(f) + 1, f * nchans(f))));
+    end
+    getchannels(fname,cur_path,nchans(f),gchans(f));
+end 
