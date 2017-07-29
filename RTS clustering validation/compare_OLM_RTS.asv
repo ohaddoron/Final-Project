@@ -30,7 +30,7 @@ RTS_res_path = fullfile(fpath,files(idx).name);
 %% run correlation
 
 [~,~,ID_OLM] = PCA_analysis(fpath,nchans,template_time_length,...
-    clusters2remove,'OLM',offset,[]);
+    clusters2remove,'KS',offset,[]);
 % [~,~,ID_RTS] = PCA_analysis(fpath,nchans,template_time_length,...
 %     clusters2remove,'RTS',offset,[]);
 
@@ -106,7 +106,9 @@ RTS_res = RTS_res((~early_spikes)&(~late_spikes));
     result.precision_calssification_rmoved_inherent ] =...
     compare_clus( OLM_clu ,RTS_clu,N_clusters);
 
-result.I_dis=ID_OLM;
+
+
+result.I_dis=ID;
 return
 
 
