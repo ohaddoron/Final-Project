@@ -31,7 +31,6 @@ S = nan([size(post_process_clusters),2]);
 %         m = nanmax(match_score);
 %         S(post_process_clusters(:,i+1) > 0,i+1,2) = m;
     end
-    a = 1;    
 
 %% Isolation distance and L-ratio
     for i = 1 : nFolders

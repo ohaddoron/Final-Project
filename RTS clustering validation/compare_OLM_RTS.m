@@ -1,5 +1,14 @@
-function result = compare_OLM_RTS (fpath,offset,thresh,varargin)
+function result = compare_OLM_RTS (fpath,offset,thresh,post_process_clusters,varargin)
 %% load data and get paths
+%% costats
+Fs=20e3;
+overlap_step=10*60*Fs;
+N_clusters  = size (post_process_clusters,1);
+nchans = 8;
+% thresh = 20; % threshold used for as a minimal isolation distance
+clusters2remove = 0; % clusters # 
+template_time_length=82; % used by PCA_analysis to crop the data
+
 % find fname
 files = dir(fullfile(fpath,'*.clu*'));
 idx = ~cellfun(@isempty,strfind({files.name},'OLM'));
@@ -19,18 +28,14 @@ RTS_res_path = fullfile(fpath,files(idx).name);
 
 
 %% run correlation
-nchans = 8;
-% thresh = 20; % threshold used for as a minimal isolation distance
-clusters2remove = 0; % clusters # 
-template_time_length=82; % used by PCA_analysis to crop the data
 
-% [~,~,ID_OLM] = PCA_analysis(fpath,nchans,template_time_length,...
-%     clusters2remove,'KS',offset,[]);
-% [~,~,ID_RTS] = PCA_analysis(fpath,nchans,template_time_length,...
-%     clusters2remove,'RTS',offset,[]);
+[~,~,ID_OLM] = PCA_analysis(fpath,nchans,template_time_length,...
+    clusters2remove,'KS',offset,[]);
+[~,~,ID_RTS] = PCA_analysis(fpath,nchans,template_time_length,...
+    clusters2remove,'RTS',offset,[]);
 
 %% save to result struct
-
+%% remove spikes with leess than offset diffrance from analysis 
 idx2remove_OLM = [false; (diff(OLM_res) <= offset)];
 idx2remove_RTS = [false; (diff(RTS_res) <= offset)];
 OLM_res(idx2remove_OLM) = [];
@@ -39,68 +44,69 @@ RTS_res(idx2remove_RTS) = [];
 RTS_clu(idx2remove_RTS) = [];
 
 
-
-
-idx_OLM = [];
-idx_RTS = [];
+%% match spike times and clc FT&TP for detection
+idx_OLM = false(length (OLM_res),1);
+idx_RTS = false(length (RTS_res),1);
 tmp_RTS_res = RTS_res;
 tmp_OLM_res = OLM_res;
 
 for i = - offset : offset
-    [C,ia,ib] = intersect(tmp_OLM_res + i,tmp_RTS_res);
-    
+    [C,~,~] = intersect(tmp_OLM_res + i,tmp_RTS_res);
     match_idx_OLM = ismember(tmp_OLM_res+i,C);
     match_idx_RTS = ismember(tmp_RTS_res,C);
     tmp_OLM_res(match_idx_OLM) = nan;
     tmp_RTS_res(match_idx_RTS) = nan;
-    idx_OLM = [idx_OLM; find(match_idx_OLM)];
-    idx_RTS = [idx_RTS; find(match_idx_RTS)];
-    if length(idx_OLM) ~= length(idx_RTS)
-        flag = 1;
-    end
+    idx_OLM = or(idx_OLM,match_idx_OLM);
+    idx_RTS = or(idx_RTS,match_idx_RTS);
+%     if length(idx_OLM) ~= length(idx_RTS)
+%         flag = 1;
+%     end
 %     idx_RTS(ismember(RTS_res,OLM_res + i)) = true;
 end
-result.FP_detection=1-length(idx_RTS)/length(RTS_clu);
-result.TP_detection=length(idx_RTS)/length(OLM_clu);
-
+%clc error rates
+idx_inherent_E_first_frame=(~idx_OLM) &   (OLM_res<overlap_step);
+result.FNR_inherent_first_frame=sum(idx_inherent_E_first_frame)/length(OLM_clu);
+result.precision_detection=1-sum(idx_RTS)/length(RTS_clu);
+result.sensitivity_detection=sum(idx_RTS)/(length(OLM_clu)-sum(idx_inherent_E_first_frame));
+%remove spikes
 OLM_clu = OLM_clu(idx_OLM);
+OLM_res=OLM_res(idx_OLM);
 RTS_clu = RTS_clu(idx_RTS);
+RTS_res = RTS_res(idx_RTS);
+%compare classification
+[ result.sensitivity_calssification,result.precision_calssification ] =...
+    compare_clus( OLM_clu ,RTS_clu,N_clusters);
 
-n_clusters_OLM = max(unique(OLM_clu));
-nSpikes_OLM = zeros(1,n_clusters_OLM);
-for i = 1 : n_clusters_OLM
-    nSpikes_OLM(i) = sum(OLM_clu == i);
+%% compear only possible spikes for RTS
+[ life_time ] = clc_life_time( post_process_clusters );
+% convert to sampls 
+life_time=life_time*overlap_step;
+%find inherent spikes
+early_spikes = false(length (RTS_res),1);
+late_spikes = false(length (RTS_res),1);
+for i=1:N_clusters
+    tmp_idx=(OLM_res<life_time(i,1))&(OLM_clu==i);
+    early_spikes=(tmp_idx|early_spikes);
+    tmp_idx=(OLM_res>life_time(i,2))&(RTS_clu==i);
+    late_spikes=(tmp_idx|late_spikes);
 end
+%clc error rates
+result.inherent_undetectionble=sum(early_spikes)/length(RTS_clu);
+result.inherent_false_calssification=sum(late_spikes)/length(RTS_clu);
 
-n_clusters_RTS = max(unique(RTS_clu));
-nSpikes_RTS = zeros(1,n_clusters_RTS);
-for i = 1 : n_clusters_RTS
-    nSpikes_RTS(i) = sum(RTS_clu == i);
-end
+%remove spikes
+OLM_clu = OLM_clu((~early_spikes)&(~late_spikes));
+OLM_res=OLM_res((~early_spikes)&(~late_spikes));
+RTS_clu = RTS_clu((~early_spikes)&(~late_spikes));
+RTS_res = RTS_res((~early_spikes)&(~late_spikes));
 
-result.TP = nan(n_clusters_OLM,1);
-result.FP = nan(n_clusters_OLM,1);
-for i = 1 : n_clusters_OLM
-    
-    tmp_clu_OLM = OLM_clu;
-    tmp_clu_OLM(OLM_clu ~= i) = nan;
-    
-    tmp_clu_RTS = RTS_clu;
-    tmp_clu_RTS(RTS_clu ~= i) = nan;
-    
-    if isempty(tmp_clu_RTS)
-        continue
-    end
-    result.TP(i) = nansum((tmp_clu_OLM - tmp_clu_RTS) == 0) / nSpikes_OLM(i);
-    tmp = OLM_clu - tmp_clu_RTS;
-    tmp(isnan(tmp)) = [];
-    if i <= n_clusters_RTS
-        result.FP(i) = nansum(tmp ~= 0) / nSpikes_RTS(i);
-    else
-        continue
-    end
-    
-end
+%compare classification
+
+[ result.sensitivity_calssification_rmoved_inherent,...
+    result.precision_calssification_rmoved_inherent ] =...
+    compare_clus( OLM_clu ,RTS_clu,N_clusters);
+
+
 result.FP(ID < thresh) = nan;
 result.hits(ID < thresh) = nan;
 result.correlation_matrix = cor_M;

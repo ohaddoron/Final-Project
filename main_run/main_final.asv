@@ -1,0 +1,17 @@
+% fpath - path to a folder containing multiple dat files
+% nchans - number of channels in each shank for each file
+% nchans_tot - number of channels in each file
+function main_final 
+%% params
+fpath = 'D:\MATLAB\Results\test';
+nchans = [8,8,8];
+nchans_tot = [40, 56, 56];
+Fs = [20e3, 20e3, 20e3];
+overlap_
+%% initialization
+files = dir(fullfile(fpath,'*.dat'));
+nFiles = length(files);
+%% split files into shanks
+[fpaths,Fs] = split2shanks ( fpath , files , nFiles, nchans, nchans_tot,Fs );
+%% split files into smaller segments
+split_times (fpaths,nchans,nchans_tot,overlap_time,max_overlap_time,Fs)    
