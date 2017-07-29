@@ -2,7 +2,7 @@
 %% get input
 path2results = get_data;
 %% run kilosort
-% run_kilosort (path2results);
+run_kilosort (path2results);
 %% run test score
 thresh = 0;
 mean_hits = zeros(length(path2results),1);
