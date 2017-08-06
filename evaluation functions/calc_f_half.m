@@ -53,11 +53,11 @@ if ~isempty(varargin)
 end
 m = sum(hits,2);
 tmp_hits = bsxfun(@rdivide,hits,m);
-figure, imagesc(tmp_hits);
-xlabel('Method 2');
-ylabel('Method 1');
-caxis([0 0.6]);
-colorbar
+% figure, imagesc(tmp_hits);
+% xlabel('Method 2');
+% ylabel('Method 1');
+% caxis([0 0.6]);
+% colorbar
 %% all spikes
  
 [P,R] = precision_recall ( hits );

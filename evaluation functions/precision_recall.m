@@ -5,7 +5,8 @@ function [P,R] = precision_recall ( hits )
 N_pairs = N_cluster1 * (N_cluster1 - 1) /2; 
 
 %% TP_FP
-spikes_in_clu2 = sum(hits);
+spikes_in_clu2 = sum(hits,1);
+
 TP_FP = 0;
 for i = 1 : N_cluster2
     if spikes_in_clu2(i) > 1

@@ -1,9 +1,14 @@
 function [clu,res] = create_RTS_clu_res(fpath,offset_val,overlap_step,max_time,Fs,clusters,template_time_length,varargin)
 %% init
-if ~isempty(varargin)
+if length(varargin) >= 1
     thresh = varargin{1};
-else
+end
+if length(varargin) >= 2
+    outpath = varargin{2};
+end
+if isempty(varargin)
     thresh = 1000;
+    outpath = fpath;
 end
 max_step = max_time * Fs * 60;
 overlap_step = overlap_step * Fs * 60;
@@ -12,6 +17,15 @@ res = [];
 files = dir(fpath);
 files(1:2) = [];
 files(~[files.isdir]) = [];
+i = 1;
+while i <= length(files)
+    if ~isstrprop(files(i).name,'digit')
+        files(i) = [];
+    else 
+        i = i + 1;
+    end
+end
+    
 names = sort(cellfun(@str2num,{files.name}));
 RTS_clu = cell(20,1);
 RTS_res = cell(20,1);
@@ -49,7 +63,7 @@ for i = 2 : nFolders
 end
 
 clu = [length(unique(clu)); clu];
-dlmwrite(fullfile(fpath,'RTS.clu.3'),clu);
-dlmwrite(fullfile(fpath,'RTS.res.3'),res,'precision',100);
+dlmwrite(fullfile(outpath,'RTS.clu.3'),clu);
+dlmwrite(fullfile(outpath,'RTS.res.3'),res,'precision',100);
 return
 

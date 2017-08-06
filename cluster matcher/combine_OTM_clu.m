@@ -1,4 +1,4 @@
-function post_process_clusters = combine_OTM_clu(fpath,clusters,overlap_step,max_time,Fs)
+function post_process_clusters = combine_OTM_clu(fpath,clusters,overlap_step,max_time,Fs,varargin)
 %% Input
 % fpath - path to folders
 % Fs is given in Hz
@@ -21,7 +21,11 @@ ordered_names = sort(fnames);
 clu = [];
 res = [];
 count = 0;
-
+if ~isempty(varargin)
+    outpath = varargin{1};
+else
+    outpath = fpath;
+end
 % figure, hold on;
 
 %% main loop
@@ -81,7 +85,7 @@ for i = 1 : length(ordered_names)
 end
 post_process_clusters = clusters;
 clu = [length(unique(clu)); clu];
-dlmwrite(fullfile(fpath,'OLM.clu.2'),clu);
-dlmwrite(fullfile(fpath,'OLM.res.2'),res,'precision',100);
+dlmwrite(fullfile(outpath,'OLM.clu.2'),clu);
+dlmwrite(fullfile(outpath,'OLM.res.2'),res,'precision',100);
 
 return    
