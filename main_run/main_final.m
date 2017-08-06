@@ -46,4 +46,6 @@ post_process_clusters = OLM_res_clu ( fpaths,clusters, overlap_time,max_time,Fs 
 %% create RTS res and clu
 RTS_res_clu(fpaths,offset_val,overlap_time,max_time,Fs,clusters,template_time_length,n_spikes_threshold)
 %% Comparison functions
-results = compare_methods ( fpaths, offset_val,post_process_clusters );
+f05_results = compare_methods ( fpaths, offset_val,post_process_clusters );
+%% Compare detection
+detection_results = detection_comparison ( fpaths , offset_val );

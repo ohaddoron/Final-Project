@@ -9,25 +9,22 @@ template_time_length=82; % used by PCA_analysis to crop the data
 
 % find fname
 KS_files = dir(KS_path);
-KS_clu_idx = ~cellfun(@isempty,strfind({KS_files.name},'clu'));
-KS_res_idx = ~cellfun(@isempty,strfind({KS_files.name},'res'));
-FF_KS_clu_path = fullfile(KS_path,KS_files(KS_clu_idx).name);
-FF_KS_res_path = fullfile(KS_path,KS_files(KS_res_idx).name);
+KS_clu_idx = 
+files = dir(fullfile(KS_path,'*.clu*'));
+idx = ~cellfun(@isempty,strfind({files.name},'OLM'));
+OLM_clu_path = fullfile(fpath,files(idx).name);
+idx = ~cellfun(@isempty,strfind({files.name},'RTS'));
+RTS_clu_path = fullfile(fpath,files(idx).name);
+idx = ~cellfun(@isempty,strfind({files.name},'FF_KS'));
+FF_KS_clu_path = fullfile(fpath,files(idx).name);
 
-OLM_files = dir(OLM_path);
-OLM_clu_idx = ~cellfun(@isempty,strfind({OLM_files.name},'clu'));
-OLM_res_idx = ~cellfun(@isempty,strfind({OLM_files.name},'res'));
-OLM_clu_path = fullfile(OLM_path,OLM_files(OLM_clu_idx).name);
-OLM_res_path = fullfile(OLM_path,OLM_files(OLM_res_idx).name);
-
-RTS_files = dir(RTS_path);
-RTS_clu_idx = ~cellfun(@isempty,strfind({RTS_files.name},'clu'));
-RTS_res_idx = ~cellfun(@isempty,strfind({RTS_files.name},'res'));
-RTS_clu_path = fullfile(RTS_path,RTS_files(RTS_clu_idx).name);
-RTS_res_path = fullfile(RTS_path,RTS_files(RTS_res_idx).name);
-
-
-
+files = dir(fullfile(fpath,'*.res*'));
+idx = ~cellfun(@isempty,strfind({files.name},'OLM'));
+OLM_res_path = fullfile(fpath,files(idx).name);
+idx = ~cellfun(@isempty,strfind({files.name},'RTS'));
+RTS_res_path = fullfile(fpath,files(idx).name);
+idx = ~cellfun(@isempty,strfind({files.name},'FF_KS'));
+FF_KS_res_path = fullfile(fpath,files(idx).name);
 
 
 [OLM_clu,OLM_res] = load_clu_res(OLM_clu_path,OLM_res_path,0);
@@ -87,11 +84,11 @@ Z(7) = sum(OLM_FF_KS_idx&RTS_FF_KS_idx);
 detection_resulrs=[Z(7)/Z(1);(Z(2)-Z(7))/Z(1);(Z(6)-Z(7))/Z(1);...
     (Z(1)-Z(2)-Z(6)+Z(7))/Z(1);(Z(3)-Z(2)-Z(4)+Z(7))/Z(1);...
     (Z(4)-Z(7))/Z(1);(Z(5)-Z(6)-Z(4)+Z(7))/Z(1)];
-% detection_resulrs=cat(2,detection_resulrs,nan(7,1));
-% figure;
-% bar(detection_resulrs','stacked');
-% legend('KS \wedge OLM \wedge RTS','KS \wedge OLM','KS \wedge RTS','KS','only OLM',...
-%     '(OLM \vee RTS) - KS','onlyRTS','Location','eastoutside');
-% xlim([.5 1.5]);
+detection_resulrs=cat(2,detection_resulrs,nan(7,1));
+figure;
+bar(detection_resulrs','stacked');
+legend('KS \wedge OLM \wedge RTS','KS \wedge OLM','KS \wedge RTS','KS','only OLM',...
+    '(OLM \vee RTS) - KS','onlyRTS','Location','eastoutside');
+xlim([.5 1.5]);
 end
 

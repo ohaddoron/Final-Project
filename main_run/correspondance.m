@@ -10,6 +10,7 @@ for i = 1 : nFolders
         [results,clusters{i}] = run_match_clusters( fpath,remove_noise,max_overlap_time,Fs,overlap_time );
         continue
     end
+    save(fullfile(fpaths{i},'Clusters'),clusters{i});
     [tmp_results,clusters{i}] = run_match_clusters( fpath,remove_noise,max_overlap_time,Fs,overlap_time );
     results = [results; tmp_results];
 end
