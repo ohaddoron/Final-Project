@@ -29,10 +29,10 @@ RTS_res_path = fullfile(fpath,files(idx).name);
 
 %% run correlation
 
-% [~,~,ID_OLM] = PCA_analysis(fpath,nchans,template_time_length,...
-%     clusters2remove,'OLM',offset,[]);
-% [~,~,ID_RTS] = PCA_analysis(fpath,nchans,template_time_length,...
-%     clusters2remove,'RTS',offset,[]);
+[~,~,ID_OLM] = PCA_analysis(fpath,nchans,template_time_length,...
+    clusters2remove,'OLM',offset,[]);
+[~,~,ID_RTS] = PCA_analysis(fpath,nchans,template_time_length,...
+    clusters2remove,'RTS',offset,[]);
 
 %% save to result struct
 %% remove spikes with leess than offset diffrance from analysis 

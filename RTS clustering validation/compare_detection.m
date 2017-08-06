@@ -1,4 +1,8 @@
-function [ bar_data ] = compare_detection( fpath,offset )
+function [ detection_resulrs ] = compare_detection( fpath,offset )
+%fpath - path to all res&clu files
+%  detection_resulrs: 7 element arreay
+% 'KS&OLM&RTS','KS&OLM&not_RTS','KS&RTS&not_OLM','KS&not_RTS&not_OLM'
+%,'only OLM' '(OLM | RTS) - KS','onlyRTS'
 
 clusters2remove = 0; % clusters # 
 template_time_length=82; % used by PCA_analysis to crop the data
@@ -71,11 +75,18 @@ end
 Z(7) = sum(OLM_FF_KS_idx&RTS_FF_KS_idx);
 
 % vennX(round(Z./1e4),5/100);
-bar_data=[Z(7)/Z(1);(Z(4)-Z(7))/Z(1);(Z(1)-Z(4))/Z(1);(Z(3)-Z(2)-Z(4)+Z(7))/Z(1);(Z(4)-Z(7))/Z(1);(Z(5)-Z(6)-Z(4)+Z(7))/Z(1)];
-bar_data=cat(2,bar_data,nan(6,1));
+%bar_data
+% 'KS&OLM&RTS','KS&OLM&not_RTS','KS&RTS&not_OLM','KS&not_RTS&not_OLM'
+%,'only OLM' '(OLM | RTS) - KS','onlyRTS'
+
+detection_resulrs=[Z(7)/Z(1);(Z(2)-Z(7))/Z(1);(Z(6)-Z(7))/Z(1);...
+    (Z(1)-Z(2)-Z(6)+Z(7))/Z(1);(Z(3)-Z(2)-Z(4)+Z(7))/Z(1);...
+    (Z(4)-Z(7))/Z(1);(Z(5)-Z(6)-Z(4)+Z(7))/Z(1)];
+detection_resulrs=cat(2,detection_resulrs,nan(7,1));
 figure;
-bar(bar_data','stacked');
-legend('KS?OLM?RTS','KS?OLM','KS','OLM\KS','OLM?RTS\KS','RTS\KS','Location','eastoutside');
+bar(detection_resulrs','stacked');
+legend('KS \wedge OLM \wedge RTS','KS \wedge OLM','KS \wedge RTS','KS','only OLM',...
+    '(OLM \vee RTS) - KS','onlyRTS','Location','eastoutside');
 xlim([.5 1.5]);
 end
 

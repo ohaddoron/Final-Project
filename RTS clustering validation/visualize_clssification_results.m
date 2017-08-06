@@ -1,5 +1,5 @@
-function [ output_args ] = visualize_results( results )
-
+function [  ] = visualize_clssification_results( results )
+%get cell arreay of results struct created by compare_OLM_RTS
 allThresh = linspace(0,80,11);
 N_files=size(results);
 
@@ -80,7 +80,7 @@ set(gca,'XTickLabel',round(allThresh,1),'XTickLabelRotation',90);
 xlabel('Isolation Distance threshold'), ylabel('ID')
 
 
-figure;
+
 
     
     

@@ -1,6 +1,6 @@
-function error = vennX( data, resolution )
+function error = my_vennX( data, resolution, N, gnames )
 %
-% function error = vennX( data, resolution )
+% function error = vennX( data, resolution, N, gnames )
 %
 % vennX - draws an area proportional venn diagram
 %
@@ -84,23 +84,32 @@ function error = vennX( data, resolution )
 %
 %  Oct. 2004
 %
+% 08sep05 from matlab website + my additions 
+%         added N as input (total observations), this allows computing 
+%         expected intersections given independence (the result is displayed as text: observed (expected)  
+%         added axis equal
+%         gnames - cell array of strings length 2 or 3 - names of events A, B( C ) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%     
-
-   figure;
-   
+if nargin<3 error('total N needed'); end  
+if nargin<4, gnames = {'' '' ''}; end    
+figure;
    if length( data ) == 3
       dist = venn2( data(1), data(2), data(3), resolution );
-      error = plot_venn2( data(1), data(2), data(3), resolution, dist );
+%       error = plot_venn2( data(1), data(2), data(3), resolution, dist );
+      error = plot_venn2( data(1), data(2), data(3), resolution, dist, N, gnames ); %%
       error = data - error';
-   elseif length( data ) == 7 
+      if isempty(gnames) | length(gnames)~=2, gnames = {'' ''}; end      
+  elseif length( data ) == 7 
        %get the pairwise distance of each circle center from each other
        dist_A_B = venn2( data(1)+data(6), data(2)+data(7), data(3)+data(4), resolution );
        dist_B_C = venn2( data(3)+data(2), data(4)+data(7), data(5)+data(6), resolution );
        dist_A_C = venn2( data(1)+data(2), data(6)+data(7), data(4)+data(5), resolution );
 
        error = plot_venn3( data(1), data(2), data(3), data(4), data(5), data(6), data(7), ...
-           resolution, dist_A_B, dist_B_C, dist_A_C );
+       resolution, dist_A_B, dist_B_C, dist_A_C, N, gnames ); 
+       %resolution, dist_A_B, dist_B_C, dist_A_C ); 
        error = data - error';
+      if isempty(gnames) | length(gnames)~=3, gnames = {'' '' ''}; end      
    else
        'vennX error, data vector must be of length 3 or 7'
    end
@@ -110,8 +119,10 @@ function error = vennX( data, resolution )
     k = [ 1 1 1; k ];
     colormap(k)
     axis off   
-   
-function error = plot_venn3( a, b, c, d, e, f, g, resolution, dist_A_B, dist_B_C, dist_A_C )
+    axis equal 
+  return  
+% function error = plot_venn3( a, b, c, d, e, f, g, resolution, dist_A_B, dist_B_C, dist_A_C )
+function error = plot_venn3( a, b, c, d, e, f, g, resolution, dist_A_B, dist_B_C, dist_A_C, N, gnames )
     
     r1 = sqrt( (a+b+f+g)/pi );
     r2 = sqrt( (b+c+d+g)/pi );
@@ -161,6 +172,8 @@ function error = plot_venn3( a, b, c, d, e, f, g, resolution, dist_A_B, dist_B_C
     text_y = mean(i);
     h = text( text_x, text_y, num2str( a ) );
     set( h, 'FontWeight', 'bold' )
+    h = text( text_x, text_y - 10, gnames{1} );
+    set( h, 'FontWeight', 'bold' )
     
     tmp = and( and( ...
            (X - center1_x).^2 + (Y - center1_y).^2 < r1^2, ...
@@ -170,7 +183,10 @@ function error = plot_venn3( a, b, c, d, e, f, g, resolution, dist_A_B, dist_B_C
     error = [ error; sum(sum(tmp)) * resolution^2 ];
     text_x = mean(j);
     text_y = mean(i);
-    h = text( text_x, text_y, num2str( b ) );
+    % add expected on graph 
+    exp_b = round( a*c/N );  
+    h = text( text_x, text_y, sprintf('%d (%d)', b , exp_b) );
+%     h = text( text_x, text_y, num2str( b ) );
     set( h, 'FontWeight', 'bold' )
     
     tmp = and( and( ...
@@ -183,7 +199,9 @@ function error = plot_venn3( a, b, c, d, e, f, g, resolution, dist_A_B, dist_B_C
     text_y = mean(i);
     h = text( text_x, text_y, num2str( c ) );
     set( h, 'FontWeight', 'bold' )
-    
+    h = text( text_x, text_y - 10, gnames{2} );
+    set( h, 'FontWeight', 'bold' )
+
     tmp = and( and( ...
            (X - center1_x).^2 + (Y - center1_y).^2 > r1^2, ...
            (X - center2_x).^2 + (Y - center2_y).^2 < r2^2 ), ...
@@ -192,7 +210,10 @@ function error = plot_venn3( a, b, c, d, e, f, g, resolution, dist_A_B, dist_B_C
     error = [ error; sum(sum(tmp)) * resolution^2 ];
     text_x = mean(j);
     text_y = mean(i);
-    h = text( text_x, text_y, num2str( d ) );
+    % add expected on graph 
+    exp_d = round( e*c/N );  
+    h = text( text_x, text_y, sprintf('%d (%d)', d , exp_d) );
+%     h = text( text_x, text_y, num2str( d ) );
     set( h, 'FontWeight', 'bold' )
     
     tmp = and( and( ...
@@ -205,7 +226,8 @@ function error = plot_venn3( a, b, c, d, e, f, g, resolution, dist_A_B, dist_B_C
     text_y = mean(i);
     h = text( text_x, text_y, num2str( e ) );
     set( h, 'FontWeight', 'bold' )
-    
+    h = text( text_x, text_y - 10, gnames{3} );
+    set( h, 'FontWeight', 'bold' )
     tmp = and( and( ...
            (X - center1_x).^2 + (Y - center1_y).^2 < r1^2, ...
            (X - center2_x).^2 + (Y - center2_y).^2 > r2^2 ), ...
@@ -214,7 +236,10 @@ function error = plot_venn3( a, b, c, d, e, f, g, resolution, dist_A_B, dist_B_C
     error = [ error; sum(sum(tmp)) * resolution^2 ];
     text_x = mean(j);
     text_y = mean(i);
-    h = text( text_x, text_y, num2str( f ) );
+    % add expected on graph 
+    exp_f = round( a*e/N );  
+    h = text( text_x, text_y, sprintf('%d (%d)', f , exp_f) );
+%     h = text( text_x, text_y, num2str( f ) );
     set( h, 'FontWeight', 'bold' )
     
     tmp = and( and( ...
@@ -225,10 +250,15 @@ function error = plot_venn3( a, b, c, d, e, f, g, resolution, dist_A_B, dist_B_C
     error = [ error; sum(sum(tmp)) * resolution^2 ];
     text_x = mean(j);
     text_y = mean(i);
-    h = text( text_x, text_y, num2str( g ) );
-    set( h, 'FontWeight', 'bold' )
+    % add expected on graph 
+    exp_g = round( a*c*e/(N^2) );  
+    h = text( text_x, text_y, sprintf('%d (%d)', g , exp_g) );
+%     h = text( text_x, text_y, num2str( g ) );
+    set( h, 'FontWeight', 'bold', 'color', [1 1 1] )
+
+return 
     
-function error = plot_venn2( a, b, c, resolution, dist )
+function error = plot_venn2( a, b, c, resolution, dist, N, gnames )
 
     r1 = sqrt( (a+b)/pi );
     r2 = sqrt( (b+c)/pi );
@@ -271,6 +301,8 @@ function error = plot_venn2( a, b, c, resolution, dist )
     text_y = mean(i);
     h = text( text_x, text_y, num2str( a ) );
     set( h, 'FontWeight', 'bold' )
+    h = text( text_x, text_y - 10, gnames{1} );
+    set( h, 'FontWeight', 'bold' )
     
     tmp = and( ...
            (X - center1_x).^2 + (Y - center1_y).^2 < r1^2, ...
@@ -279,7 +311,10 @@ function error = plot_venn2( a, b, c, resolution, dist )
     error = [ error; sum(sum(tmp)) * resolution^2 ];
     text_x = mean(j);
     text_y = mean(i);
-    h = text( text_x, text_y, num2str( b ) );
+    % add expected on graph 
+    exp_b = round( a*c/N );  
+    h = text( text_x, text_y, sprintf('%d (%d)', b , exp_b) );
+%     h = text( text_x, text_y, num2str( b ) );
     set( h, 'FontWeight', 'bold' )
 
     tmp = and( ...
@@ -290,6 +325,8 @@ function error = plot_venn2( a, b, c, resolution, dist )
     text_x = mean(j);
     text_y = mean(i);
     h = text( text_x, text_y, num2str( c ) );
+    set( h, 'FontWeight', 'bold' )
+    h = text( text_x, text_y - 10, gnames{2} );
     set( h, 'FontWeight', 'bold' )
 
     
