@@ -1,7 +1,7 @@
 function visualize_detection ( detection_results )
 
 %% init 
-nDays = length(comparison_results);
+nDays = length(detection_results);
 data = nan(nDays,7);
 eData = nan(nDays,7);
 %% statistics
