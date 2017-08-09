@@ -1,0 +1,36 @@
+%% params
+name = 'm258r1.dat';
+% path = 'D:\MATLAB\m258r1.286 - Testing';
+original_path = 'D:\MATLAB\testset';
+% fpath = 'D:\MATLAB\Results\test';
+original_fpath = 'D:\MATLAB\Results\test';
+path2figures = fullfile(original_fpath,'figures');
+if ~exist(path2figures,'dir'), mkdir(path2figures), end
+skip{1} = 4;
+skip{2} = [1,2];
+skip{3} = 1;
+nchans = 8;
+nchans_tot = 56;
+nchans_used = 32;
+Fs = 20e3;
+overlap_time = 10;
+max_overlap_time = 30;
+offset_val = 3;
+max_time = 40;
+template_time_length = 82;
+path2config1 = 'D:\MATLAB\Results\test\1';
+path2config2 = 'D:\MATLAB\Results\test\2-end';
+remove_noise = true;
+clusters2remove = 0;
+n_spikes_threshold = 1000; % minimal number of spikes for a cluster to be concidered
+folders = dir(original_path);
+folders(1:2) = [];
+folders(~[folders.isdir]) = [];
+nFolders = length(folders);
+clusters = cell(nFolders,1);
+post_process_clusters = cell(nFolders,1);
+comparison_results = cell(nFolders,1);
+detection_results = cell(nFolders,1);
+OLM_RTS_results = cell(nFolders,1);
+tmp_fpaths = cell(nFolders,1);
+dat_paths = cell(nFolders,1);
