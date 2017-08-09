@@ -61,5 +61,7 @@ end
 spike_times{1}(spike_times{1} < template_time_length/2 ) = [];
 spike_times{end}(spike_times{end} > max(blocks(:)) - template_time_length/2) = [];
 res = cat(1,spike_times{:});
+idx2remove = [false; diff(res) < 0];
+res(idx2remove) = [];
 return
 

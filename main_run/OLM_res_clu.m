@@ -12,5 +12,3 @@ for i = 1 : nFolders
     post_process_clusters = all_post_process_clusters{i};
     save(fullfile(fpaths{i},'post_process_clusters'),'post_process_clusters');
 end
-all_post_process_clusters = cat(1,all_post_process_clusters);
-return
