@@ -27,7 +27,7 @@ for i = 1 : n_clusters_OLM
     if isempty(tmp_clu_RTS)
         continue
     end
-    sensitivity_calssification(i) = nansum((tmp_clu_OLM - tmp_clu_RTS) == 0) / nSpikes_OLM(i);
+    sensitivity_calssificat/ion(i) = nansum((tmp_clu_OLM - tmp_clu_RTS) == 0) / nSpikes_OLM(i);
     tmp = OLM_clu - tmp_clu_RTS;
     tmp(isnan(tmp)) = [];
     if i <= n_clusters_RTS

@@ -24,36 +24,31 @@
 
 function [D_sqr,L_ratio,ID] = PCA_analysis...
     (fpath,nchans,template_time_length,clusters2remove,clusterMethod,...
-    resOffest,merged_templates_idx,varargin)
+    resOffest,merged_templates_idx)
 %% initialize 
 allspikes=[];
 % Use 2 if files are the output of KS and 1 if the files are the output of
 % KK.
-if ~isempty(varargin)
-    path2clu = varargin{1};
-    path2res = varargin{2};
-    fname = varargin{3};
-else
-    switch clusterMethod 
-        case 'KS'
-            files = dir(fullfile(fpath,'*.2'));
-        case 'KK'
-            files = dir(fullfile(fpath,'*.1'));
-        case 'RTS'
-            files = dir(fullfile(fpath,'*RTS*'));
-        case 'OLM'
-            files = dir(fullfile(fpath,'*OLM*'));
-    end
-    clu_idx = ~cellfun(@isempty,strfind({files.name},'clu'));
-    res_idx = ~cellfun(@isempty,strfind({files.name},'res'));
-    path2clu = fullfile(fpath,files(clu_idx).name);
-    path2res = fullfile(fpath,files(res_idx).name);
-
-
-    files = dir(fullfile(fpath,'*.dat'));
-    temp_wh_idx = ~cellfun(@isempty,strfind({files.name},'temp_wh.dat'));
-    fname = fullfile(fpath,files(temp_wh_idx).name);    
+switch clusterMethod 
+    case 'KS'
+        files = dir(fullfile(fpath,'*.2'));
+    case 'KK'
+        files = dir(fullfile(fpath,'*.1'));
+    case 'RTS'
+        files = dir(fullfile(fpath,'*RTS*'));
+    case 'OLM'
+        files = dir(fullfile(fpath,'*OLM*'));
 end
+clu_idx = ~cellfun(@isempty,strfind({files.name},'clu'));
+res_idx = ~cellfun(@isempty,strfind({files.name},'res'));
+path2clu = fullfile(fpath,files(clu_idx).name);
+path2res = fullfile(fpath,files(res_idx).name);
+
+
+files = dir(fullfile(fpath,'*.dat'));
+temp_wh_idx = ~cellfun(@isempty,strfind({files.name},'temp_wh.dat'));
+fname = fullfile(fpath,files(temp_wh_idx).name);
+
 %% constants
 nbytes = 2;         % [bytes/sample]
 blocksize = 1e6;    % [samples/channel]

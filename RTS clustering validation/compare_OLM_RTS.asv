@@ -107,7 +107,7 @@ end
 %clc error rates
 result.inherent_undetectionble=sum(early_spikes)/length(RTS_clu);
 result.inherent_false_calssification=sum(late_spikes)/length(RTS_clu);
-result.N_inherent_spikes=sum(early_spikes|late_spikes);
+
 %remove spikes
 OLM_clu = OLM_clu((~early_spikes)&(~late_spikes));
 OLM_res=OLM_res((~early_spikes)&(~late_spikes));

@@ -1,4 +1,4 @@
-function [ output_args ] = visualize__clssification results( results )
+function [  ] = visualize_clssification_results( results )
 %get cell arreay of results struct created by compare_OLM_RTS
 allThresh = linspace(0,80,11);
 N_files=size(results);
@@ -18,10 +18,10 @@ for n = 1 : size(allThresh)
     cur_precision_calssification_rmoved_inherent=[];
     tmp_results = results;
     for m = 1 : N_files
-        nan_idx = results(m).ID_OLM < allThresh(n);
+        nan_idx = results(m).I_dis < allThresh(n);
         tmp_results(m).sensitivity_calssification(nan_idx) = nan;
         tmp_results(m).precision_calssification (nan_idx) = nan;
-        tmp_results(m).ID_OLM(nan_idx) = nan;
+        tmp_results(m).I_dis(nan_idx) = nan;
         tmp_results(m).sensitivity_calssification_rmoved_inherent(nan_idx) = nan;
         tmp_results(m).precision_calssification_rmoved_inherent(nan_idx) = nan;
 
@@ -30,7 +30,7 @@ for n = 1 : size(allThresh)
         cur_precision_calssification = cat(1,cur_precision_calssification,...
             (tmp_results(m).precision_calssification(:)));
         cur_neurons = cat(1,cur_neurons,sum(~isnan(tmp_results(m).sensitivity_calssification)));
-        cur_ID = cat(1,cur_ID,tmp_results(m).ID_OLM(:));
+        cur_ID = cat(1,cur_ID,tmp_results(m).I_dis(:));
         cur_sensitivity_calssification_rmoved_inherent = cat(1,cur_sensitivity_calssification_rmoved_inherent,...
             (tmp_results(m).sensitivity_calssification_rmoved_inherent(:)));
         cur_precision_calssification_rmoved_inherent = cat(1,cur_precision_calssification_rmoved_inherent,...
@@ -79,10 +79,5 @@ boxplot(ID)
 set(gca,'XTickLabel',round(allThresh,1),'XTickLabelRotation',90);
 xlabel('Isolation Distance threshold'), ylabel('ID')
 
-
-
-
-    
-    
 end
 
