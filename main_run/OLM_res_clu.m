@@ -9,5 +9,6 @@ for i = 1 : nFolders
     outpath = fullfile(fpath,'OLM');
     if ~exist(outpath,'dir'); mkdir(outpath); end
     post_process_clusters{i} = combine_OTM_clu ( fpath, clusters{i} ,overlap_time, max_time, Fs,outpath);
-    save(fullfile(fpaths{i},'post_process_clusters'),post_process_clusters{i});
+    tmp_post_process_clusters = post_process_clusters{i};
+    save(fullfile(fpaths{i},'post_process_clusters'),'tmp_post_process_clusters');
 end

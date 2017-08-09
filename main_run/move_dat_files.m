@@ -10,7 +10,7 @@ for i = 1 : nFolders
     if ~exist(dat_paths{i},'dir')
         mkdir(dat_paths{i});
     end
-    movefile(fullfile(fpaths{i},files.name),fullfile(dat_paths{i},files.name));
+    copyfile(fullfile(fpaths{i},files.name),fullfile(dat_paths{i},files.name));
 end
 return
     
