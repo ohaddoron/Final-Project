@@ -9,8 +9,8 @@ function analysis = create_analysis (clu1,res1,clu2,res2,samples_offset)
 % we currently did not attempt to resolve the issue of temporally
 % overlapping spike peaks. This is an issue that may be resolved in the
 % future.
-idx2remove1 = diff(res1) <= samples_offset;
-idx2remove2 = diff(res2) <= samples_offset;
+idx2remove1 = diff(res1) == 0;
+idx2remove2 = diff(res2) == 0;
 
 res1(idx2remove1) = [];
 res2(idx2remove2) = [];

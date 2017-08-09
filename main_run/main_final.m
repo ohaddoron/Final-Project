@@ -70,20 +70,33 @@ for i = 1 : nFolders
     copy_KS_files_full ( dat_paths{i},path2config1 );
     run_kilosort(dat_paths{i})
     fprintf('Kilosort run complete! \n');
-    %% copy KS RTS clu and res
+end
+%% copy KS RTS clu and res
+for i = 1 : nFolders
     KS_res_clu ( dat_paths{i} , remove_noise ) ;
 end
-%%
+%% cluster correspondance
 for i = 1 : nFolders
     fpaths = tmp_fpaths{i};
-    %% cluster correspondance
     [~,clusters{i}] = correspondance ( fpaths,max_overlap_time,overlap_time,Fs,remove_noise );
-    %% create OLM res and clu
+end
+%% create OLM res and clu
+for i = 1 : nFolders
+    fpaths = tmp_fpaths{i};
     post_process_clusters{i} = OLM_res_clu ( fpaths,clusters{i}, overlap_time,max_time,Fs );
-    %% create RTS res and clu
+end
+%% create RTS res and clu
+for i = 1 : nFolders
+    fpaths = tmp_fpaths{i};
     RTS_res_clu(fpaths,offset_val,overlap_time,max_time,Fs,clusters{i},template_time_length,n_spikes_threshold)
-    %% Comparison functions
+end
+%% Comparison functions
+for i = 1 : nFolders
+    fpaths = tmp_fpaths{i};   
     comparison_results{i} = compare_methods ( fpaths, offset_val,post_process_clusters{i} );
-    %% Compare detection
+end
+%% Compare detection
+for i = 1 : nFolders
+    fpaths = tmp_fpaths{i};   
     detection_results{i} = detection_comparison ( fpaths , offset_val );
 end
