@@ -90,13 +90,11 @@ for i = 1 : nFolders
     fpaths = tmp_fpaths{i};
     RTS_res_clu(fpaths,offset_val,overlap_time,max_time,Fs,clusters{i},template_time_length,n_spikes_threshold)
 end
-%% Comparison functions
+
 for i = 1 : nFolders
     fpaths = tmp_fpaths{i};   
+    %% Comparison functions
     comparison_results{i} = compare_methods ( fpaths, offset_val,post_process_clusters{i} );
-end
-%% Compare detection
-for i = 1 : nFolders
-    fpaths = tmp_fpaths{i};   
+    %% Compare detection
     detection_results{i} = detection_comparison ( fpaths , offset_val );
 end
