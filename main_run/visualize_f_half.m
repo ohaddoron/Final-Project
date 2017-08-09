@@ -1,4 +1,4 @@
-function visualize_f_half ( comparison_results )
+function visualize_f_half ( comparison_results,path2figures )
 
 %% init
 nDays = length(comparison_results);
@@ -55,5 +55,8 @@ for i = 1 : nbars
     errorbar(x,data(:,i),eData(:,i),'k','linestyle','none');
 end
 
+savefig(h,fullfile(path2figures,'f half results'));
+saveas(h,fullfile(path2figures,'f half.png'));
+return
 
 

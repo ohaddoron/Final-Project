@@ -1,4 +1,4 @@
-function visualize_detection ( detection_results )
+function visualize_detection ( detection_results,path2figures )
 
 %% init 
 nDays = length(detection_results);
@@ -13,8 +13,9 @@ end
 
 %% plot 
 % Properties of the bar graph as required
+h = figure;
 ax = axes;
-h = bar(data,'stacked','BarWidth',1);
+b = bar(data,'stacked','BarWidth',1);
 ax.YGrid = 'on';
 ax.GridLineStyle = '-';
 
@@ -47,5 +48,9 @@ groupwidth = min(0.8, nbars/(nbars + 1.5));
 x = 1 : ngroups;
 % Set the position of each error bar in the centre of the main bar
 for i = 1 : nbars
-    errorbar(x,sum(cat(1,h(1:i).YData),1),eData(:,i),'k','linestyle','none');
+    errorbar(x,sum(cat(1,b(1:i).YData),1),eData(:,i),'k','linestyle','none');
 end
+savefig(h,fullfile(path2figures,'Detection results'));
+saveas(h,fullfile(path2figures,'Detection results.png'));
+return
+

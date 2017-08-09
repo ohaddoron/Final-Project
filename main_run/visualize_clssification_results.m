@@ -1,4 +1,4 @@
-function [  ] = visualize_clssification_results( results )
+function visualize_clssification_results( results,path2figures )
 %get cell arreay of results struct created by compare_OLM_RTS
 allThresh = linspace(0,80,11);
 con_results=[];
@@ -52,7 +52,7 @@ for n = 1 : length(allThresh)
         cur_precision_calssification_rmoved_inherent);
     
 end
-figure;
+h = figure;
 subplot(3,2,1);
 boxplot(1e2*sensitivity_calssification);
 set(gca,'XTickLabel',round(allThresh,1),'XTickLabelRotation',90);
@@ -87,7 +87,8 @@ boxplot(ID)
 set(gca,'XTickLabel',round(allThresh,1),'XTickLabelRotation',90);
 xlabel('Isolation Distance threshold'), ylabel('ID')
 
-
+savefig(h,fullfile(path2figures,'TPR-FPR'));
+saveas(h,fullfile(path2figures,'TPR-FPR.png'));
 
 nDays = length(results);
 data = nan(nDays,3);
@@ -104,8 +105,8 @@ end
 
 %% plot 
 % Properties of the bar graph as required
+h = figure;
 ax = axes;
-figure;
 h = bar(data,'stacked','BarWidth',1);
 ax.YGrid = 'on';
 ax.GridLineStyle = '-';
@@ -141,5 +142,8 @@ x = 1 : ngroups;
 for i = 1 : nbars
     errorbar(x,sum(cat(1,h(1:i).YData),1),eData(:,i),'k','linestyle','none');
 end
+savefig(h,fullfile(path2figures,'Classification Error'));
+saveas(h,fullfile(path2figures,'Classification Error.png'));
+
 end
 

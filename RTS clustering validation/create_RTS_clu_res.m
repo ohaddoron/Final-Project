@@ -61,7 +61,12 @@ for i = 2 : nFolders
         
     
 end
-
+idx2remove = [false; diff(res) < 0];
+while sum(idx2remove) > 0
+    res(idx2remove) = [];
+    clu(idx2remove) = [];
+    idx2remove = [false; diff(res) < 0];
+end
 clu = [length(unique(clu)); clu];
 dlmwrite(fullfile(outpath,'RTS.clu.3'),clu);
 dlmwrite(fullfile(outpath,'RTS.res.3'),res,'precision',100);

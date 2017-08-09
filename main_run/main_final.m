@@ -7,6 +7,8 @@ name = 'm258r1.dat';
 original_path = 'D:\MATLAB\testset';
 % fpath = 'D:\MATLAB\Results\test';
 original_fpath = 'D:\MATLAB\Results\test';
+path2figures = fullfile(original_fpath,'figures');
+if ~exist(path2figures,'dir'), mkdir(path2figures), end
 nchans = 8;
 nchans_tot = 56;
 nchans_used = 32;
@@ -19,6 +21,7 @@ template_time_length = 82;
 path2config1 = 'D:\MATLAB\Results\test\1';
 path2config2 = 'D:\MATLAB\Results\test\2-end';
 remove_noise = true;
+clusters2remove = 0;
 n_spikes_threshold = 1000; % minimal number of spikes for a cluster to be concidered
 folders = dir(original_path);
 folders(1:2) = [];
@@ -28,6 +31,7 @@ clusters = cell(nFolders,1);
 post_process_clusters = cell(nFolders,1);
 comparison_results = cell(nFolders,1);
 detection_results = cell(nFolders,1);
+OLM_RTS_results = cell(nFolders,1);
 tmp_fpaths = cell(nFolders,1);
 dat_paths = cell(nFolders,1);
 %%
@@ -100,3 +104,13 @@ for i = 1 : nFolders
     fpaths = tmp_fpaths{i};   
     detection_results{i} = detection_comparison ( fpaths , offset_val );
 end
+%% compare OLM RTS
+for i = 1 : nFolders
+    fpaths = tmp_fpaths{i};
+    OLM_RTS_results{i} = compare_OLM_RTS_wrapper ( fpaths,offset_val,post_process_clusters{i},...
+        Fs,overlap_time,nchans,clusters2remove,template_time_length );
+end
+%% visualize
+visualize_detection ( detection_results,path2figures )
+visualize_f_half ( comparison_results,path2figures )
+visualize_trough2peak_vs_LT ( fpaths,Fs )
