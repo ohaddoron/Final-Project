@@ -24,7 +24,7 @@ h = figure;
 scatter(t2p/Fs * 1e3,LT,15,'Filled');
 xlabel('Trough to Peak [msec]');
 ylabel('Life Time');
-
+lsline;
 savefig(h,fullfile(path2figures,'Trough to Peak results'));
 saveas(h,fullfile(path2figures,'Trough to Peak results.png'));
 

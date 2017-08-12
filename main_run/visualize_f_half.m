@@ -7,35 +7,60 @@ eData = nan(nDays,3);
 labels = cell(nDays,1);
 %% statistics
 for day = 1 : nDays 
-    results = comparison_resutls{day};
-    data(day,1) = nanmean(cat(1,results.f_half_KS_OLM));
-    data(day,2) = nanmean(cat(1,results.f_half_KS_RTS));
-    data(day,3) = nanmean(cat(1,results.f_half_OLM_RTS));
-    eData(day,1) = nanstd(cat(1,results.f_half_KS_OLM));
-    eData(day,2) = nanstd(cat(1,results.f_half_KS_RTS));
-    eData(day,3) = nanstd(cat(1,results.f_half_OLM_RTS));
+    
+    results = comparison_results{day};
+    if size(results.f_half_KS_OLM,1) == 1
+        flag = true;
+    end
+    tmp = nanmean(cat(1,results.f_half_KS_OLM),1);
+    data(day,1) = tmp(end);
+    tmp = nanmean(cat(1,results.f_half_KS_RTS),1);
+    data(day,2) = tmp(end);
+    tmp = nanmean(cat(1,results.f_half_OLM_RTS),1);
+    data(day,3) = tmp(end);
+    tmp = nanstd(cat(1,results.f_half_KS_OLM),0,1);
+    eData(day,1) = tmp(end);
+    tmp = nanstd(cat(1,results.f_half_KS_RTS),0,1);
+    eData(day,2) = tmp(end);
+    tmp = nanstd(cat(1,results.f_half_OLM_RTS),0,1);
+    eData(day,3) = tmp(end);
 end
 %% plot
-
+if flag 
+    eData = nan(size(eData));
+end
 % Properties of the bar graph as required
+if nDays == 1
+    data = [data; nan(1,length(data))];
+    eData =[eData; nan(1,length(eData))];
+end
+h = figure;
 ax = axes;
-h = bar(data,'BarWidth',1);
+b = bar(data,'BarWidth',1);
 ax.YGrid = 'on';
 ax.GridLineStyle = '-';
-
+% if nDays == 1
+%     xlim([0 2]);
+% end
 % Naming each of the bar groups
-xticks(ax,1 : nDays);
-for day = 1 : nDays
-    labels{day} = sprintf('Day %d',day);
+ax.XTick = 1 : nDays;
+if flag 
+    labels = {'Training Set','Test Set'};
+else
+    for day = 1 : nDays
+        labels{day} = sprintf('Day %d',day);
+    end
 end
-xticklabels(ax,labels);
+set(ax,'XTickLabel',labels,'FontSize',14);
 
 % X and Y labels
-ylabel('f_{1/2}');
-xlabel('Days');
+ylabel('f_{1/2}','FontSize',14);
+if ~flag
+    xlabel('Days','FontSize',14);
+end
 
 % Creating a legend and placing it outside the bar plot
-lg = legend({'KS vs OLM','KS vs RTS','OLM vs RTS'},'autoupdate','off');
+lg = legend({'KS vs OLM','KS vs RTS','OLM vs RTS'},'FontSize',12);
 lg.Location = 'BestOutside';
 lg.Orientation = 'Horizontal';
 
@@ -54,9 +79,10 @@ for i = 1 : nbars
     x = (1:ngroups) - groupwidth/2 + (2*i-1) * groupwidth / (2*nbars);
     errorbar(x,data(:,i),eData(:,i),'k','linestyle','none');
 end
+set(gcf, 'Position', get(0, 'Screensize'));
 
 savefig(h,fullfile(path2figures,'f half results'));
-saveas(h,fullfile(path2figures,'f half.png'));
+saveas(h,fullfile(path2figures,'f half results.png'));
 return
 
 

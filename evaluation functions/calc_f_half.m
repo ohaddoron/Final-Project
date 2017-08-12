@@ -30,12 +30,27 @@ path2clu2 = fullfile(path2,clu2name);
 %% removal of noise clusters    
 if exist('remove_noise','var')
     if remove_noise
-        path2templates = fullfile(path1,'templates.mat');
-        load(path2templates);
-        templates_idx = noise_remover(merged_templates);
-        idx2remove = ~ismember(clu1,templates_idx);
-        clu1(idx2remove) = [];
-        res1(idx2remove) = [];
+        [~,tmp,~] = fileparts(path1);
+        if strcmp(tmp,'KS')
+            path1 = strrep(path1,tmp,'Full');
+            path2templates = fullfile(path1,'templates.mat');
+            load(path2templates);
+            templates_idx = noise_remover(merged_templates);
+            idx2remove = ~ismember(clu1,templates_idx);
+            clu1(idx2remove) = [];
+            res1(idx2remove) = [];
+        
+        end
+        [~,tmp,~] = fileparts(path2);        
+        if strcmp(tmp,'KS')
+            path2 = strrep(path2,tmp,'Full');
+            path2templates = fullfile(path2,'templates.mat');
+            load(path2templates);
+            templates_idx = noise_remover(merged_templates);
+            idx2remove = ~ismember(clu2,templates_idx);
+            clu2(idx2remove) = [];
+            res2(idx2remove) = [];
+        end
     end
 end
 %% Calculate hits

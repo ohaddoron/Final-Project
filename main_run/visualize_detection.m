@@ -1,15 +1,26 @@
 function visualize_detection ( detection_results,path2figures )
 
-%% init 
+%% init
+flag = false;
 nDays = length(detection_results);
 data = nan(nDays,7);
 eData = nan(nDays,7);
 %% statistics
 for day = 1 : nDays
     raw_data = detection_results{day};
-    data(day,:) = mean(raw_data,2);
-    eData(day,:) = std(raw_data,0,2);
+    data(day,:) = 100 * mean(raw_data,2);
+    if size(raw_data,2) == 1
+        eData(day,:) = nan;
+        flag = true;
+    else
+        eData(day,:) = 100 * std(raw_data,0,2);
+    end
 end
+if nDays == 1
+    data = [data; nan(1,length(data))];
+    eData = [eData; nan(1,length(data))];
+end
+
 
 %% plot 
 % Properties of the bar graph as required
@@ -18,25 +29,34 @@ ax = axes;
 b = bar(data,'stacked','BarWidth',1);
 ax.YGrid = 'on';
 ax.GridLineStyle = '-';
-
+if nDays == 1
+    xlim([0, 2]);
+end
 % Naming each of the bar groups
 % xticks(ax,1 : nDays);
 ax.XTick = 1 : nDays;
-for day = 1 : nDays
-    labels{day} = sprintf('Day %d',day);
+if flag
+    labels = {'Training Set','Test Set'}
+else
+    for day = 1 : nDays
+        labels{day} = sprintf('Day %d',day);
+    end
 end
-ax.XTickLabels = labels;
+set(ax,'XTickLabels',labels,'FontSize',14);
 
 
 % X and Y labels
-ylabel('Detection [%]');
-xlabel('Days');
+ylabel('Detection [%]','FontSize',14);
+if ~flag
+    xlabel('Days','FontSize',14);
+end
 
 % Creating a legend and placing it outside the bar plot
 lg = legend({'KS&OLM&RTS','KS&OLM&~RTS','KS&RTS&~OLM','KS&~RTS&~OLM'...
-    ,'only OLM','(OLM | RTS) - KS','only RTS'},'FontSize',14);
+    ,'only OLM','(OLM | RTS) - KS','only RTS'},'FontSize',12);
 lg.Location = 'BestOutside';
 lg.Orientation = 'Horizontal';
+set(gcf, 'Position', get(0, 'Screensize'));
 
 
 hold on;

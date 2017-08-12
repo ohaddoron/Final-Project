@@ -21,16 +21,16 @@ N_clusters  = size (post_process_clusters,1);
 
 % find fname
 files = dir(OLM_path);
-idx = contains({files.name},'clu');
+idx = ~cellfun(@isempty,strfind({files.name},'clu'));
 OLM_clu_path = fullfile(OLM_path,files(idx).name);
-idx = contains({files.name},'res');
+idx = ~cellfun(@isempty,strfind({files.name},'res'));
 OLM_res_path = fullfile(OLM_path,files(idx).name);
 
 
 files = dir(RTS_path);
-idx = contains({files.name},'clu');
+idx = ~cellfun(@isempty,strfind({files.name},'clu'));
 RTS_clu_path = fullfile(RTS_path,files(idx).name);
-idx = contains({files.name},'res');
+idx = ~cellfun(@isempty,strfind({files.name},'res'));
 RTS_res_path = fullfile(RTS_path,files(idx).name);
 
 

@@ -2,7 +2,7 @@
 % nchans - number of channels in each shank for each file
 % nchans_tot - number of channels in each file
 %%
-% config_main_run;
+config_main_run;
 %%
 for i = 4 : nFolders
     path = fullfile(original_path,folders(i).name);
@@ -23,7 +23,7 @@ for i = 4 : nFolders
     fprintf('Files spliting into segments complete! \n');
 end
 %%
-for i = 2 : nFolders
+for i = 3 : nFolders
     fpaths = tmp_fpaths{i};
     %% copy KS config files
     copy_KS_files ( fpaths,path2config1,path2config2 );
@@ -45,7 +45,7 @@ for i = 2 : nFolders
     fprintf('Kilosort run complete! \n');
 end
 %% copy KS RTS clu and res
-for i = 1 : nFolders
+for i = 2 : nFolders
     KS_res_clu ( dat_paths{i} , remove_noise ) ;
 end
 %% cluster correspondance
@@ -74,7 +74,7 @@ for i = 1 : nFolders
     detection_results{i} = detection_comparison ( fpaths , offset_val );
 end
 %% Save results
-save(fullfile(original_fpath,datestr(datetime)));
+save(fullfile(original_fpath,strrep(datestr(datetime),':','-')));
 %% compare OLM RTS
 for i = 1 : nFolders
     fpaths = tmp_fpaths{i};
@@ -82,9 +82,10 @@ for i = 1 : nFolders
         Fs,overlap_time,nchans,clusters2remove,template_time_length );
 end
 %% Save results
-save(fullfile(original_fpath,datestr(datetime)));
+save(fullfile(original_fpath,strrep(datestr(datetime),':','-')));
 %% visualize
 visualize_detection ( detection_results,path2figures )
 visualize_f_half ( comparison_results,path2figures )
-visualize_trough2peak_vs_LT ( fpaths,Fs )
+visualize_trough2peak_vs_LT ( tmp_fpaths,Fs,path2figures )
 visualize_clssification_results( OLM_RTS_results,path2figures )
+visualize_LT ( tmp_fpaths,overlap_time, path2figures )

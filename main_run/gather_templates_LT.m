@@ -4,6 +4,7 @@ function [templates,LT] = gather_templates_LT ( fpaths )
 nShanks = length(fpaths);
 templates = cell(nShanks,1);
 post_process_clusters = cell(nShanks,1);
+LT = cell(nShanks,1);
 %%
 for i = 1 : nShanks
     %%
@@ -20,6 +21,7 @@ for i = 1 : nShanks
     clusters = tmp.clusters;
     tmp = load(fullfile(fpath,'post_process_clusters.mat'));
     post_process_clusters{i} = tmp.post_process_clusters;
+    LT{i} = sum(post_process_clusters{i} > 0 ,2);
     %%
     for k = 1 : nTimes
         cur_path = fullfile(fpath,files(names == k).name);
@@ -37,7 +39,7 @@ for i = 1 : nShanks
 end
 templates = cat(3,templates{:});
 post_process_clusters = cat(1,post_process_clusters{:});
-LT = sum(post_process_clusters > 0 ,2);
+% LT = sum(post_process_clusters > 0 ,2);
 return 
 
         
