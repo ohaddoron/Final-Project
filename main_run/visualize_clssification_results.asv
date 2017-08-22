@@ -118,8 +118,7 @@ ylabel('Iolation Distance','FontSize',14)
 grid on
 
 set(gcf, 'Position', get(0, 'Screensize'));
-t = suptitle('Testing Set');
-t.FontSize = 16;
+
 savefig(h,fullfile(path2figures,'TPR-FPR - test'));
 saveas(h,fullfile(path2figures,'TPR-FPR - test.png'));
 

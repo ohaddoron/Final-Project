@@ -86,6 +86,6 @@ save(fullfile(original_fpath,strrep(datestr(datetime),':','-')));
 %% visualize
 visualize_detection ( detection_results,path2figures )
 visualize_f_half ( comparison_results,path2figures )
-visualize_trough2peak_vs_LT ( tmp_fpaths,Fs,path2figures )
+visualize_trough2peak_vs_LT ( tmp_fpaths,Fs,path2figures,OLM_RTS_results )
 visualize_clssification_results( OLM_RTS_results,path2figures )
 visualize_LT ( tmp_fpaths,overlap_time, path2figures )

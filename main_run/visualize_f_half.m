@@ -2,8 +2,8 @@ function visualize_f_half ( comparison_results,path2figures )
 
 %% init
 nDays = length(comparison_results);
-data = nan(nDays,3);
-eData = nan(nDays,3);
+data = nan(nDays,4);
+eData = nan(nDays,4);
 labels = cell(nDays,1);
 %% statistics
 for day = 1 : nDays 
@@ -12,18 +12,22 @@ for day = 1 : nDays
     if size(results.f_half_KS_OLM,1) == 1
         flag = true;
     end
-    tmp = nanmean(cat(1,results.f_half_KS_OLM),1);
+    tmp = nanmean(cat(1,results.f_half_KK_KS),1);
     data(day,1) = tmp(end);
-    tmp = nanmean(cat(1,results.f_half_KS_RTS),1);
+    tmp = nanmean(cat(1,results.f_half_KS_OLM),1);
     data(day,2) = tmp(end);
-    tmp = nanmean(cat(1,results.f_half_OLM_RTS),1);
+    tmp = nanmean(cat(1,results.f_half_KS_RTS),1);
     data(day,3) = tmp(end);
-    tmp = nanstd(cat(1,results.f_half_KS_OLM),0,1);
+    tmp = nanmean(cat(1,results.f_half_OLM_RTS),1);
+    data(day,4) = tmp(end);
+    tmp = nanstd(cat(1,results.f_half_KK_KS),0,1);
     eData(day,1) = tmp(end);
-    tmp = nanstd(cat(1,results.f_half_KS_RTS),0,1);
+    tmp = nanstd(cat(1,results.f_half_KS_OLM),0,1);
     eData(day,2) = tmp(end);
-    tmp = nanstd(cat(1,results.f_half_OLM_RTS),0,1);
+    tmp = nanstd(cat(1,results.f_half_KS_RTS),0,1);
     eData(day,3) = tmp(end);
+    tmp = nanstd(cat(1,results.f_half_OLM_RTS),0,1);
+    eData(day,4) = tmp(end);
 end
 %% plot
 if flag 
@@ -60,7 +64,7 @@ if ~flag
 end
 
 % Creating a legend and placing it outside the bar plot
-lg = legend({'KS vs OLM','KS vs RTS','OLM vs RTS'},'FontSize',12);
+lg = legend({'KK vs KS','KS vs OLM','KS vs RTM','OLM vs RTM'},'FontSize',12);
 lg.Location = 'BestOutside';
 lg.Orientation = 'Horizontal';
 
